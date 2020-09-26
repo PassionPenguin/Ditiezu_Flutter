@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart' hide Toast;
 
 class Toast {
+  ToastStateFul tsf;
+
   Toast(BuildContext ctx, String message, {MaterialColor accentColor = Colors.lightGreen, IconData icon = CupertinoIcons.check_mark}) {
     var ft = FToast();
     ft.init(ctx);
-    ft.showToast(
+    tsf = ft.showToast(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
           decoration: BoxDecoration(
@@ -33,5 +35,9 @@ class Toast {
             right: 0,
           );
         });
+  }
+
+  void hideIt() {
+    tsf.hideIt();
   }
 }

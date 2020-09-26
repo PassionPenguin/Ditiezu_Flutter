@@ -1,24 +1,27 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:ditiezu_app/app.dart';
 import 'package:ditiezu_app/model/user.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserModel with ChangeNotifier {
-  User _user;
-  User get user => _user;
+  UserModel();
 
-  /// 初始化 User
-  void initUser() {
-    if (Application.sp.containsKey('user')) {
-      String s = Application.sp.getString('user');
+  UserModel.init(SharedPreferences sp) {
+    if (sp.containsKey('user')) {
+      String s = sp.getString('user');
       _user = User.fromJson(json.decode(s));
-    }
+    } else
+      _user = null;
   }
 
+  User _user;
+
+  User get user => _user;
+
   /// 保存用户信息到 sp
-  _saveUserInfo(User user) {
-    _user = user;
+  static saveUserInfo(User user) {
     Application.sp.setString('user', json.encode(user.toJson()));
   }
 }

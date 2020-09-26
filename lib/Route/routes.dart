@@ -1,12 +1,15 @@
+import 'package:ditiezu_app/Route/route_handlers.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart' hide Router;
-import 'package:ditiezu_app/Route/route_handlers.dart';
 
 class Routes {
   static Router router;
   static String root = "/";
   static String home = "/home";
   static String login = "/login";
+  static String forum = "/forum";
+  static String thread = "/thread";
+
   // 配置route
   static void configureRoutes(Router router) {
     // 未发现对应route
@@ -15,13 +18,15 @@ class Routes {
       return;
     });
 
-    router.define(home, handler: homeHandler); // 设置
-    router.define(login, handler: loginHandler); // 网页加载
+    router.define(home, handler: homeHandler);
+    router.define(login, handler: loginHandler);
+    router.define(forum, handler: forumHandler);
+    router.define(thread, handler: threadHandler);
   }
 
   // 对参数进行encode，解决参数中有特殊字符，影响fluro路由匹配
   static Future navigateTo(BuildContext context, String path, {Map<String, dynamic> params, TransitionType transition = TransitionType.native}) {
-    String query =  "";
+    String query = "";
     if (params != null) {
       int index = 0;
       for (var key in params.keys) {
@@ -35,9 +40,8 @@ class Routes {
         index++;
       }
     }
-    print('我是navigateTo传递的参数：$query');
 
     path = path + query;
-    return router.navigateTo(context, path, transition:transition);
+    return router.navigateTo(context, path, transition: transition);
   }
 }
