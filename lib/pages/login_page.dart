@@ -65,9 +65,7 @@ class _LoginPageState extends State<LoginPage> {
       Directory appDocDir = await getApplicationDocumentsDirectory();
       String appDocPath = appDocDir.path;
       var cookieJar = PersistCookieJar(dir: appDocPath + "/.cookies/");
-      if (cookieJar
-          .loadForRequest(Uri.http("www.ditiezu.com", ""))
-          .isEmpty) await NetWork(retrieveAsDesktopPage: false, gbkDecoding: false).get("http://www.ditiezu.com/forum.php?mod=forum");
+      if (cookieJar.loadForRequest(Uri.http("www.ditiezu.com", "")).isEmpty) await NetWork(retrieveAsDesktopPage: false, gbkDecoding: false).get("http://www.ditiezu.com/forum.php?mod=forum");
       var response = await NetWork(retrieveAsDesktopPage: false, gbkDecoding: false, autoRedirect: false).get("http://www.ditiezu.com/member.php?mod=logging&action=login&mobile=yes");
       if (response.contains("./?mobile=yes")) {
         Toast(context, "正在跳转中", accentColor: Colors.lightGreen, icon: CupertinoIcons.check_mark);
@@ -189,30 +187,30 @@ class _LoginPageState extends State<LoginPage> {
               Row(children: [
                 Expanded(
                     child: CupertinoButton(
-                      child: Wrap(children: [
-                        Offstage(
-                            offstage: isLoading,
-                            child: AnimatedOpacity(
-                                opacity: isLoading ? 0 : 1,
-                                duration: Duration(seconds: 1),
-                                child: SizedBox(height: 20, child: Text("LOGIN", style: TextStyle(fontSize: 18, height: 1.25, fontWeight: FontWeight.w600))))),
-                        Offstage(
-                            offstage: !isLoading,
-                            child: AnimatedOpacity(
-                                opacity: isLoading ? 1 : 0,
-                                duration: Duration(seconds: 1),
-                                child: SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation(Colors.white),
-                                      backgroundColor: Colors.lightBlue,
-                                      strokeWidth: 3,
-                                    ))))
-                      ]),
-                      onPressed: performLogin,
-                      color: Colors.lightBlue,
-                    ))
+                  child: Wrap(children: [
+                    Offstage(
+                        offstage: isLoading,
+                        child: AnimatedOpacity(
+                            opacity: isLoading ? 0 : 1,
+                            duration: Duration(seconds: 1),
+                            child: SizedBox(height: 20, child: Text("LOGIN", style: TextStyle(fontSize: 18, height: 1.25, fontWeight: FontWeight.w600))))),
+                    Offstage(
+                        offstage: !isLoading,
+                        child: AnimatedOpacity(
+                            opacity: isLoading ? 1 : 0,
+                            duration: Duration(seconds: 1),
+                            child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                                  backgroundColor: Colors.lightBlue,
+                                  strokeWidth: 3,
+                                ))))
+                  ]),
+                  onPressed: performLogin,
+                  color: Colors.lightBlue,
+                ))
               ])
             ]),
           ]),
@@ -236,13 +234,8 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
     var doc = parseHtmlDocument(response);
-    var status = doc
-        .querySelector("#messagetext .mbn")
-        .innerHtml
-        .contains("欢迎您回来");
-    Toast(context, doc
-        .querySelector("#messagetext .mbn")
-        .innerHtml, accentColor: status ? Colors.lightGreen : Colors.red, icon: status ? CupertinoIcons.check_mark : CupertinoIcons.clear);
+    var status = doc.querySelector("#messagetext .mbn").innerHtml.contains("欢迎您回来");
+    Toast(context, doc.querySelector("#messagetext .mbn").innerHtml, accentColor: status ? Colors.lightGreen : Colors.red, icon: status ? CupertinoIcons.check_mark : CupertinoIcons.clear);
     if (status) {
       var usr = User(
           uid: int.parse(response.substring(response.indexOf("discuz_uid = '") + 14, response.indexOf("'", response.indexOf("discuz_uid = '") + 14))),
@@ -254,10 +247,7 @@ class _LoginPageState extends State<LoginPage> {
         Routes.navigateTo(context, "/home");
       });
     }
-    if (doc
-        .querySelector("#messagetext .mbn")
-        .innerHtml
-        .contains("验证码填写错误")) {
+    if (doc.querySelector("#messagetext .mbn").innerHtml.contains("验证码填写错误")) {
       initState();
     }
     isLoading = false;
