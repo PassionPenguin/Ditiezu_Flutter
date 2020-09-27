@@ -37,6 +37,7 @@ const STYLED_ELEMENTS = [
   "u",
   "var",
   "wbr",
+  "font",
 
   //BLOCK ELEMENTS
   "article",

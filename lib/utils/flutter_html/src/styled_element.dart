@@ -1,3 +1,4 @@
+import 'package:ditiezu_app/utils/flutter_html/Extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:ditiezu_app/utils/flutter_html/style.dart';
 import 'package:html/dom.dart' as dom;
@@ -228,9 +229,10 @@ StyledElement parseStyledElement(dom.Element element, List<StyledElement> childr
       break;
     case "hr":
       styledElement.style = Style(
-        margin: EdgeInsets.symmetric(vertical: 7.0),
+        margin: EdgeInsets.only(top: 3.0, bottom: 6.0),
         width: double.infinity,
-        border: Border(bottom: BorderSide(width: 1.0)),
+        height: 1,
+        border: Border(bottom: BorderSide(width: 1.0, color: Colors.grey[300])),
         display: Display.BLOCK,
       );
       break;
@@ -241,6 +243,13 @@ StyledElement parseStyledElement(dom.Element element, List<StyledElement> childr
       break;
     italics:
     case "i":
+      if(element.classes.contains("pstatus"))
+        styledElement.style = Style(
+          fontStyle: FontStyle.italic,
+          fontSize: FontSize.small,
+          color: Colors.grey
+        );
+      else
       styledElement.style = Style(
         fontStyle: FontStyle.italic,
       );
@@ -354,6 +363,45 @@ StyledElement parseStyledElement(dom.Element element, List<StyledElement> childr
       break;
     case "var":
       continue italics;
+      break;
+    case "font":
+      print("FONT!!!");
+      print(element.attributes.toString());
+      var style = Style();
+      if (element.attributes["size"] != null)
+        switch (element.attributes["size"]) {
+          case "0":
+          case "1":
+            style.fontSize = FontSize.xxSmall;
+            break;
+          case "2":
+            style.fontSize = FontSize.xSmall;
+            break;
+          case "3":
+            style.fontSize = FontSize.small;
+            break;
+          case "4":
+            style.fontSize = FontSize.medium;
+            break;
+          case "5":
+            style.fontSize = FontSize.large;
+            break;
+          case "6":
+            style.fontSize = FontSize.xLarge;
+            break;
+          case "7":
+            style.fontSize = FontSize.xxLarge;
+            break;
+        }
+      if (element.attributes["color"] != null) {
+        var color = element.attributes["color"];
+
+        if (color.contains("#"))
+          style.color = HexColor.fromHex(color);
+        else if (color.contains("rgb")) style.color = RGBColor.fromRGB(color);
+      }
+      styledElement.style = style;
+      break;
   }
 
   return styledElement;
