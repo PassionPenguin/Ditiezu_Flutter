@@ -161,8 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: TextInput(_codeController, TextInputType.text,
                         prefix: Row(children: [Padding(padding: EdgeInsets.only(left: 12)), Icon(Icons.code, color: Colors.grey, size: 16)]),
                         placeholder: "Code",
-                        style: TextStyle(fontSize: 14),
-                        obscureText: true))
+                        style: TextStyle(fontSize: 14)))
               ]),
               SizedBox(height: 12),
               Row(children: [
@@ -223,7 +222,7 @@ class _LoginPageState extends State<LoginPage> {
     isLoading = true;
     setState(() {});
     var response = await NetWork().post("http://www.ditiezu.com/$formAction",
-        "formhash=$formHash&referer=http%3A%2F%2Fwww.ditiezu.com%2Fforum.php%3Fmod%3Dforum%26mobile%3Dyes&username=${Uri.encodeComponent(_usrNameController.text)}&password=${Uri.encodeComponent(_pwdController.text)}&sechash=$codeHash&seccodeverify=${Uri.encodeComponent(_codeController.text)}&questionid=$questionID&answer=${Uri.encodeComponent(_questionController.text)}&cookietime=2592000&submit=%E7%99%BB%E5%BD%95");
+        "formhash=$formHash&referer=http%3A%2F%2Fwww.ditiezu.com%2Fforum.php%3Fmod%3Dforum%26mobile%3Dyes&username=${Uri.encodeComponent(_usrNameController.text)}&password=${Uri.encodeComponent(_pwdController.text)}&sechash=$codeHash&seccodeverify=${Uri.encodeComponent(_codeController.text)}&questionid=$questionID&answer=${Uri.encodeComponent(_questionController.text)}&cookietime=15552000&submit=%E7%99%BB%E5%BD%95");
     if (response.contains("forum.php?mod=forum") && !response.contains("<head>")) {
       Toast(context, "正在跳转中", accentColor: Colors.lightGreen, icon: CupertinoIcons.check_mark);
       isLoading = false;

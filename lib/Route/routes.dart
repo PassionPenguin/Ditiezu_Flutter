@@ -9,19 +9,21 @@ class Routes {
   static String login = "/login";
   static String forum = "/forum";
   static String thread = "/thread";
+  static String account = "/account";
 
   // 配置route
   static void configureRoutes(Router router) {
     // 未发现对应route
     router.notFoundHandler = Handler(handlerFunc: (BuildContext context, Map<String, dynamic> params) {
-      print('route not found!');
-      return;
+      print('Route not found!');
+      throw NullThrownError();
     });
 
     router.define(home, handler: homeHandler);
     router.define(login, handler: loginHandler);
     router.define(forum, handler: forumHandler);
     router.define(thread, handler: threadHandler);
+    router.define(account, handler: accountHandler);
   }
 
   // 对参数进行encode，解决参数中有特殊字符，影响fluro路由匹配
@@ -43,5 +45,9 @@ class Routes {
 
     path = path + query;
     return router.navigateTo(context, path, transition: transition);
+  }
+
+  static void pop(BuildContext context) {
+    return router.pop(context);
   }
 }

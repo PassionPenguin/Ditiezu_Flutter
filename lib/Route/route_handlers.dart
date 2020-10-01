@@ -2,6 +2,7 @@
 import 'package:ditiezu_app/pages/Home/home_page.dart';
 import 'package:ditiezu_app/pages/ViewForum.dart';
 import 'package:ditiezu_app/pages/ViewThread.dart';
+import 'package:ditiezu_app/pages/account_tab.dart';
 import 'package:ditiezu_app/pages/login_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,4 +23,9 @@ var forumHandler = new Handler(handlerFunc: (BuildContext context, Map<String, L
 
 var threadHandler = new Handler(handlerFunc: (BuildContext context, Map<String, List<Object>> params) {
   return ViewThread(int.parse(params["tid"]?.first), int.parse(params["page"]?.first));
+});
+
+
+var accountHandler = new Handler(handlerFunc: (BuildContext context, Map<String, List<Object>> params) {
+  return AccountTab();
 });

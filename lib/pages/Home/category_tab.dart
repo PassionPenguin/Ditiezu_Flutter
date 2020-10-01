@@ -7,8 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 class CategoryTab extends StatefulWidget {
   CategoryTab(this.ctx);
 
-  BuildContext ctx;
-  static const title = "Category";
+  final BuildContext ctx;
 
   @override
   State<StatefulWidget> createState() => _CategoryTabState(ctx);

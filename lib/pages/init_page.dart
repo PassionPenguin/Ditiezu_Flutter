@@ -16,7 +16,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _scaleTween = Tween(begin: 0, end: 1);
-    _logoController = AnimationController(vsync: this, duration: Duration(milliseconds: 500))..drive(_scaleTween);
+    _logoController = AnimationController(duration: Duration(milliseconds: 500), vsync: this)..drive(_scaleTween);
     Future.delayed(Duration(milliseconds: 500), () {
       _logoController.forward();
     });
@@ -59,7 +59,9 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
           scale: _logoAnimation,
           child: Hero(
             tag: 'logo',
-            child: Image.asset('assets/images/logo.png'),
+            child: Stack(
+                children: [Positioned(bottom: 24, child: CircularProgressIndicator())],
+                alignment: Alignment.center),
           ),
         ),
       ),

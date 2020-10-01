@@ -1,4 +1,5 @@
 import 'package:ditiezu_app/Network/network.dart';
+import 'package:ditiezu_app/Route/routes.dart';
 import 'package:ditiezu_app/model/ThreadItem.dart';
 import 'package:ditiezu_app/widgets/w_loading.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,8 +10,7 @@ import 'package:universal_html/parsing.dart';
 class DiscoveryTab extends StatefulWidget {
   DiscoveryTab(this.ctx);
 
-  BuildContext ctx;
-  static const title = "Home";
+  final BuildContext ctx;
 
   @override
   State<StatefulWidget> createState() => _DiscoveryTabState(ctx);
@@ -33,7 +33,7 @@ class _DiscoveryTabState extends State<DiscoveryTab> {
     });
   }
 
-  void _contentRetriever() async {
+  _contentRetriever() async {
     lw = LoadingWidget(ctx);
     var response = await NetWork(gbkDecoding: true).get("http://www.ditiezu.com/?mod=rss");
     if (homeList.isEmpty) {
@@ -79,7 +79,9 @@ class _DiscoveryTabState extends State<DiscoveryTab> {
                     top: false,
                     bottom: false,
                     child: InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          Routes.navigateTo(context, Routes.thread, params: {'tid': data.threadID.toString(), "page": data.threadPage.toString()});
+                        },
                         child: Padding(
                             padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, right: 24.0),
                             child: Row(children: [

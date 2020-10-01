@@ -1,9 +1,11 @@
+import 'package:ditiezu_app/app.dart';
 import 'package:ditiezu_app/pages/Home/category_tab.dart';
 import 'package:ditiezu_app/pages/Home/discovery_tab.dart';
 import 'package:ditiezu_app/pages/Home/notification_tab.dart';
+import 'package:ditiezu_app/pages/account_tab.dart';
+import 'package:ditiezu_app/utils/ScreenSize.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -23,8 +25,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _pageController = PageController(initialPage: 0);
+    _tabController = TabController(length: 4, vsync: this);
+    _pageController = PageController(initialPage: 1);
   }
 
   _onTabPageChange(index, {bool isOnTab = false}) {
@@ -48,6 +50,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = Application.screenWidth;
     return Scaffold(
       appBar: PreferredSize(
         child: AppBar(elevation: 0, backgroundColor: Colors.transparent),
@@ -55,33 +58,37 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       ),
       backgroundColor: Colors.white,
       body: SafeArea(
-        //底部异常
         bottom: false,
         child: Column(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(150)),
+              padding: EdgeInsets.symmetric(horizontal: screenWidth >= 400 ? (screenWidth - 400) / 2 : 0),
               child: TabBar(
-                onTap: (index) {
-                  _isOnTab = true;
-                  _onTabPageChange(index, isOnTab: true);
-                },
-                labelColor: Colors.black,
-                unselectedLabelColor: Colors.grey,
-                indicator: UnderlineTabIndicator(),
-                controller: _tabController,
-                tabs: [
-                  Tab(
-                    child: Text("发现", style: _selectIndex == 0 ? _selectStyle : _defaultStyle),
-                  ),
-                  Tab(
-                    child: Text("分区", style: _selectIndex == 1 ? _selectStyle : _defaultStyle),
-                  ),
-                  Tab(
-                    child: Text("通知", style: _selectIndex == 2 ? _selectStyle : _defaultStyle),
-                  ),
-                ],
-              ),
+                  onTap: (index) {
+                    _isOnTab = true;
+                    _onTabPageChange(index, isOnTab: true);
+                  },
+                  labelColor: Colors.black,
+                  unselectedLabelColor: Colors.grey,
+                  indicator: UnderlineTabIndicator(),
+                  controller: _tabController,
+                  tabs: [
+                    Tab(
+                      child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12.0),
+                          child: FadeInImage.assetNetwork(
+                              width: 24, height: 24, placeholder: "assets/images/noavatar_middle.png", image: "http://ditiezu.com/uc_server/avatar.php?mod=avatar&uid=${Application.user.uid}")),
+                    ),
+                    Tab(
+                      child: Text("发现", style: _selectIndex == 0 ? _selectStyle : _defaultStyle),
+                    ),
+                    Tab(
+                      child: Text("分区", style: _selectIndex == 1 ? _selectStyle : _defaultStyle),
+                    ),
+                    Tab(
+                      child: Text("通知", style: _selectIndex == 2 ? _selectStyle : _defaultStyle),
+                    ),
+                  ]),
             ),
             Expanded(
               child: PageView(
@@ -94,20 +101,26 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 children: <Widget>[
                   Center(
                       child: Container(
-                    height: ScreenUtil.screenHeight,
-                    width: ScreenUtil.screenWidth,
+                    height: height(context),
+                    width: width(context),
+                    child: AccountTab(),
+                  )),
+                  Center(
+                      child: Container(
+                    height: height(context),
+                    width: width(context),
                     child: DiscoveryTab(context),
                   )),
                   Center(
                       child: Container(
-                    height: ScreenUtil.screenHeight,
-                    width: ScreenUtil.screenWidth,
+                    height: height(context),
+                    width: width(context),
                     child: CategoryTab(context),
                   )),
                   Center(
                       child: Container(
-                    height: ScreenUtil.screenHeight,
-                    width: ScreenUtil.screenWidth,
+                    height: height(context),
+                    width: width(context),
                     child: NotificationTab(context),
                   )),
                 ],
