@@ -1,6 +1,6 @@
-import 'package:ditiezu_app/utils/flutter_html/Extensions.dart';
-import 'package:flutter/material.dart';
+import 'package:ditiezu_app/utils/exts.dart';
 import 'package:ditiezu_app/utils/flutter_html/style.dart';
+import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/src/query_selector.dart';
 
@@ -140,10 +140,13 @@ StyledElement parseStyledElement(dom.Element element, List<StyledElement> childr
     case "dfn":
       continue italics;
     case "div":
-      styledElement.style = Style(
-        margin: EdgeInsets.all(0),
-        display: Display.BLOCK,
-      );
+      if (element.classes.contains("locked"))
+        styledElement.style = Style(border: Border.all(color: Colors.red[200], width: 0.5), margin: EdgeInsets.only(top: 12, bottom: 3), padding: EdgeInsets.all(3), display: Display.BLOCK, fontSize: FontSize.small, color: Colors.grey); // Locked Element
+      else
+        styledElement.style = Style(
+          margin: EdgeInsets.all(0),
+          display: Display.BLOCK,
+        );
       break;
     case "dl":
       styledElement.style = Style(
@@ -243,16 +246,12 @@ StyledElement parseStyledElement(dom.Element element, List<StyledElement> childr
       break;
     italics:
     case "i":
-      if(element.classes.contains("pstatus"))
+      if (element.classes.contains("pstatus"))
+        styledElement.style = Style(fontStyle: FontStyle.italic, fontSize: FontSize.small, color: Colors.grey);
+      else
         styledElement.style = Style(
           fontStyle: FontStyle.italic,
-          fontSize: FontSize.small,
-          color: Colors.grey
         );
-      else
-      styledElement.style = Style(
-        fontStyle: FontStyle.italic,
-      );
       break;
     case "ins":
       continue underline;
@@ -365,8 +364,6 @@ StyledElement parseStyledElement(dom.Element element, List<StyledElement> childr
       continue italics;
       break;
     case "font":
-      print("FONT!!!");
-      print(element.attributes.toString());
       var style = Style();
       if (element.attributes["size"] != null)
         switch (element.attributes["size"]) {

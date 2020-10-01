@@ -1,5 +1,21 @@
 import 'dart:ui';
 
+extension Number on num {
+  bool isIn(a, b) {
+    return this <= b && this >= a;
+  } // 区间判断
+}
+
+extension Str on String {
+  int toInt() {
+    return int.parse(this);
+  }
+
+  double toDouble() {
+    return double.parse(this);
+  }
+}
+
 extension HexColor on Color {
   /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
   static Color fromHex(String hexString) {
@@ -10,7 +26,7 @@ extension HexColor on Color {
   }
 }
 
-extension RGBColor on Color{
+extension RGBColor on Color {
   static Color fromRGB(String rgbString) {
     var tmp = rgbString.substring(4, rgbString.length - 1).split(",");
     return Color.fromARGB(255, int.parse(tmp[0]), int.parse(tmp[1]), int.parse(tmp[2]));

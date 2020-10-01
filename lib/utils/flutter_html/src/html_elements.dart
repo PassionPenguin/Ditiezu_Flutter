@@ -1,6 +1,6 @@
-export 'styled_element.dart';
 export 'interactable_element.dart';
 export 'replaced_element.dart';
+export 'styled_element.dart';
 
 const STYLED_ELEMENTS = [
   "abbr",
@@ -77,14 +77,11 @@ const INTERACTABLE_ELEMENTS = [
 ];
 
 const REPLACED_ELEMENTS = [
-  "audio",
   "br",
   "head",
-  "iframe",
   "img",
   "svg",
   "template",
-  "video",
   "rp",
   "rt",
   "ruby",
