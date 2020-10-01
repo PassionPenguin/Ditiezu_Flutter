@@ -23,7 +23,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  gzx_dropdown_menu: ^2.1.0
   shared_preferences: ^0.5.6
   fluro: ^1.5.1
   fluttertoast: ^7.1.1
@@ -38,11 +37,10 @@ dependencies:
   provider: ^3.2.0
   flutter_svg: any
   flutter_screenutil: any
+  qr_flutter: ^3.1.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
-  flutter_html: ^1.0.2
-
 
 dev_dependencies:
   flutter_test:
@@ -64,6 +62,7 @@ flutter:
     - assets/
     - assets/images/
     - assets/images/categoryIcons/
+    - assets/images/smiley/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
