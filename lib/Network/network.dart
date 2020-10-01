@@ -39,17 +39,17 @@ class NetWork {
         client.userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537 (KHTML, like Gecko) Chrome/87 Safari/537";
       else
         client.userAgent = "Mozilla/5.0 (Linux; Android 6.0;) AppleWebKit/537 (KHTML, like Gecko) Chrome/87 Mobile Safari/537";
-      client.findProxy = (uri) {
-        // return "PROXY 127.0.0.1:8888";
-        return "PROXY 192.168.50.201:8888";
-      };
-      // client.badCertificateCallback =
-      //     (X509Certificate cert, String host, int port) => true;
+      // client.findProxy = (uri) {
+      //   // return "PROXY 127.0.0.1:8888";
+      //   return "PROXY 192.168.50.201:8888";
+      // };
+      client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
     };
     return dio;
   }
 
   Future<String> get(String url) async {
+    log("GET $url");
     dio = await openConn();
     var result = await dio.get(url,
         options: Options(
@@ -69,6 +69,7 @@ class NetWork {
   }
 
   Future<String> post(String url, String formData) async {
+    log("POST $url");
     dio = await openConn();
     dio.options.contentType = "application/x-www-form-urlencoded";
     var result = await dio.post(url,
@@ -89,7 +90,31 @@ class NetWork {
     return gbkDecoding ? gbk.decode(result.data) : result.data.toString();
   }
 
+  Future<List<String>> retrieveRedirect(String url) async {
+    log("GET $url");
+    dio = await openConn();
+    var result = await dio.get(url,
+        options: Options(
+            responseType: gbkDecoding ? ResponseType.bytes : ResponseType.plain,
+            headers: queryHeaders,
+            followRedirects: false,
+            validateStatus: (code) {
+              return true;
+            }));
+    if (result.statusCode >= 300 && result.statusCode <= 399) {
+      var href = result.headers["location"][0];
+      var tid = href.substring(href.indexOf("tid=") + 4, href.indexOf("&", href.indexOf("tid=") + 4));
+      var page = href.substring(href.indexOf("page=") + 5, href.indexOf("#", href.indexOf("page=") + 5));
+      return [tid, page];
+    }
+    return ["-1", "1"];
+  }
+
   Future<bool> checkLogin() async {
     return parseHtmlDocument(await get("http://www.ditiezu.com/forum.php?gid=149")).querySelector("#lsform") == null ? true : false;
+  }
+
+  log(msg) {
+    print("[NETWORK] $msg");
   }
 }
