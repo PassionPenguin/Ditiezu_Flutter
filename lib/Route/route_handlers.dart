@@ -1,9 +1,9 @@
 // splash 页面
+import 'package:ditiezu_app/pages/Home/account_tab.dart';
 import 'package:ditiezu_app/pages/Home/home_page.dart';
+import 'package:ditiezu_app/pages/LoginPage.dart';
 import 'package:ditiezu_app/pages/ViewForum.dart';
 import 'package:ditiezu_app/pages/ViewThread.dart';
-import 'package:ditiezu_app/pages/account_tab.dart';
-import 'package:ditiezu_app/pages/login_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 

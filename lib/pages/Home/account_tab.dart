@@ -1,4 +1,5 @@
 import 'package:ditiezu_app/Network/network.dart';
+import 'package:ditiezu_app/Route/routes.dart';
 import 'package:ditiezu_app/app.dart';
 import 'package:ditiezu_app/utils/exts.dart';
 import 'package:ditiezu_app/widgets/v_empty_view.dart';
@@ -29,69 +30,75 @@ class _AccountTabState extends State<AccountTab> {
           await NetWork(retrieveAsDesktopPage: true, gbkDecoding: true)
               .get("http://www.ditiezu.com/home.php?mod=space");
       var doc = parseHtmlDocument(response);
-      var pts = doc.querySelector("#psts li").text.substring(2).trim().toInt();
-      var max = pts.isIn(1, 49)
-          ? 50
-          : pts.isIn(50, 199)
-              ? 200
-              : pts.isIn(200, 499)
-                  ? 500
-                  : pts.isIn(500, 999)
-                      ? 1000
-                      : pts.isIn(1000, 2999)
-                          ? 3000
-                          : pts.isIn(3000, 4999)
-                              ? 5000
-                              : pts.isIn(5000, 9999)
-                                  ? 10000
-                                  : pts.isIn(10000, 19999)
-                                      ? 20000
-                                      : pts.isIn(20000, 49999)
-                                          ? 50000
-                                          : 0;
-      var min = pts.isIn(1, 49)
-          ? 0
-          : pts.isIn(50, 199)
-              ? 50
-              : pts.isIn(200, 499)
-                  ? 200
-                  : pts.isIn(500, 999)
-                      ? 500
-                      : pts.isIn(1000, 2999)
-                          ? 1000
-                          : pts.isIn(3000, 4999)
-                              ? 3000
-                              : pts.isIn(5000, 9999)
-                                  ? 5000
-                                  : pts.isIn(10000, 19999)
-                                      ? 10000
-                                      : pts.isIn(20000, 49999)
-                                          ? 20000
-                                          : 0;
-      lv = doc.querySelector(".pbm span a").text;
-      this.pts = pts;
-      this.prestige =
-          doc.querySelectorAll("#psts li")[1].nodes[1].text.trim().toInt();
-      this.money =
-          doc.querySelectorAll("#psts li")[2].nodes[1].text.trim().toInt();
-      this.mScore =
-          doc.querySelectorAll("#psts li")[3].nodes[1].text.trim().toInt();
-      this.popularity =
-          doc.querySelectorAll("#psts li")[4].nodes[1].text.trim().toInt();
+      if(doc.querySelector("#wp").innerHtml.contains('<a id="succeedmessage_href">如果你的浏览器没有自动跳转，请点击此链接</a>'))Routes.navigateTo(context, "/login");
+      try {
+        var pts =
+            doc.querySelector("#psts li").text.substring(2).trim().toInt();
+        var max = pts.isIn(1, 49)
+            ? 50
+            : pts.isIn(50, 199)
+                ? 200
+                : pts.isIn(200, 499)
+                    ? 500
+                    : pts.isIn(500, 999)
+                        ? 1000
+                        : pts.isIn(1000, 2999)
+                            ? 3000
+                            : pts.isIn(3000, 4999)
+                                ? 5000
+                                : pts.isIn(5000, 9999)
+                                    ? 10000
+                                    : pts.isIn(10000, 19999)
+                                        ? 20000
+                                        : pts.isIn(20000, 49999)
+                                            ? 50000
+                                            : 0;
+        var min = pts.isIn(1, 49)
+            ? 0
+            : pts.isIn(50, 199)
+                ? 50
+                : pts.isIn(200, 499)
+                    ? 200
+                    : pts.isIn(500, 999)
+                        ? 500
+                        : pts.isIn(1000, 2999)
+                            ? 1000
+                            : pts.isIn(3000, 4999)
+                                ? 3000
+                                : pts.isIn(5000, 9999)
+                                    ? 5000
+                                    : pts.isIn(10000, 19999)
+                                        ? 10000
+                                        : pts.isIn(20000, 49999)
+                                            ? 20000
+                                            : 0;
+        lv = doc.querySelector(".pbm span a").text;
+        this.pts = pts;
+        this.prestige =
+            doc.querySelectorAll("#psts li")[1].nodes[1].text.trim().toInt();
+        this.money =
+            doc.querySelectorAll("#psts li")[2].nodes[1].text.trim().toInt();
+        this.mScore =
+            doc.querySelectorAll("#psts li")[3].nodes[1].text.trim().toInt();
+        this.popularity =
+            doc.querySelectorAll("#psts li")[4].nodes[1].text.trim().toInt();
 
-      var meta = doc
-          .querySelector(".cl.bbda.pbm.mbm")
-          .querySelectorAll("li")
-          .where((i) {
-        return i.children[0].innerText == "统计信息";
-      }).first;
-      this.friends =
-          meta.querySelectorAll("a")[0].text.trim().substring(4).toInt();
-      this.replies =
-          meta.querySelectorAll("a")[1].text.trim().substring(4).toInt();
-      this.posts =
-          meta.querySelectorAll("a")[2].text.trim().substring(4).toInt();
-      setState(() {});
+        var meta = doc
+            .querySelector(".cl.bbda.pbm.mbm")
+            .querySelectorAll("li")
+            .where((i) {
+          return i.children[0].innerText == "统计信息";
+        }).first;
+        this.friends =
+            meta.querySelectorAll("a")[0].text.trim().substring(4).toInt();
+        this.replies =
+            meta.querySelectorAll("a")[1].text.trim().substring(4).toInt();
+        this.posts =
+            meta.querySelectorAll("a")[2].text.trim().substring(4).toInt();
+        setState(() {});
+      } catch (e) {
+        print(e);
+      }
     }();
     super.initState();
   }

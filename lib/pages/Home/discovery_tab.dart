@@ -35,7 +35,8 @@ class _DiscoveryTabState extends State<DiscoveryTab> {
 
   _contentRetriever() async {
     lw = LoadingWidget(ctx);
-    var response = await NetWork(gbkDecoding: true).get("http://www.ditiezu.com/?mod=rss");
+    var response =
+        await NetWork(gbkDecoding: true).get("http://www.ditiezu.com/?mod=rss");
     if (homeList.isEmpty) {
       var document = parseXmlDocument(response);
       List<ThreadItem> tmpList = [];
@@ -51,7 +52,9 @@ class _DiscoveryTabState extends State<DiscoveryTab> {
               element.querySelector("category").innerHtml,
               threadId,
               1,
-              element.querySelector("enclosure") != null ? element.querySelector("enclosure").attributes["url"] : null,
+              element.querySelector("enclosure") != null
+                  ? element.querySelector("enclosure").attributes["url"]
+                  : null,
               -1,
               0,
               0));
@@ -60,8 +63,10 @@ class _DiscoveryTabState extends State<DiscoveryTab> {
       tmpList.forEach((element) {
         homeList.add(element);
       });
-      setState(() {});
-      lw.onCancel();
+      try {
+        setState(() {});
+        lw.onCancel();
+      } catch (e) {}
     }
   }
 
@@ -74,21 +79,35 @@ class _DiscoveryTabState extends State<DiscoveryTab> {
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   var data = homeList[index];
-                  var dt = DateFormat("dd MMM yyyy hh:mm:ss").parse(data.pubDate.substring(5, data.pubDate.length - 6)); // "dd MMM yyyy hh:mm:ss"
+                  var dt = DateFormat("dd MMM yyyy hh:mm:ss").parse(data.pubDate
+                      .substring(5,
+                          data.pubDate.length - 6)); // "dd MMM yyyy hh:mm:ss"
                   return SafeArea(
                     top: false,
                     bottom: false,
                     child: InkWell(
                         onTap: () {
-                          Routes.navigateTo(context, Routes.thread, params: {'tid': data.threadID.toString(), "page": data.threadPage.toString()});
+                          Routes.navigateTo(context, Routes.thread, params: {
+                            'tid': data.threadID.toString(),
+                            "page": data.threadPage.toString()
+                          });
                         },
                         child: Padding(
-                            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, right: 24.0),
+                            padding: const EdgeInsets.only(
+                                top: 8.0, bottom: 8.0, right: 24.0),
                             child: Row(children: [
                               Padding(padding: EdgeInsets.only(left: 24.0)),
-                              if (data.enclosureUrl != null && data.enclosureUrl.trim() != "")
+                              if (data.enclosureUrl != null &&
+                                  data.enclosureUrl.trim() != "")
                                 Row(children: [
-                                  ClipRRect(borderRadius: BorderRadius.circular(4), child: Image(image: NetworkImage(data.enclosureUrl), width: 120, height: 120, fit: BoxFit.cover)),
+                                  ClipRRect(
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: Image(
+                                          image:
+                                              NetworkImage(data.enclosureUrl),
+                                          width: 120,
+                                          height: 120,
+                                          fit: BoxFit.cover)),
                                   Padding(padding: EdgeInsets.only(left: 16))
                                 ]),
                               Expanded(
@@ -98,12 +117,22 @@ class _DiscoveryTabState extends State<DiscoveryTab> {
                                   Padding(padding: EdgeInsets.only(top: 8)),
                                   Text(
                                     data.threadTitle,
-                                    style: TextStyle(fontSize: 18.5, fontWeight: FontWeight.w600, color: Colors.black87),
+                                    style: TextStyle(
+                                        fontSize: 18.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87),
                                   ),
                                   Padding(padding: EdgeInsets.only(top: 4)),
-                                  Text("${data.authorName} ${data.badge} ${dt.month}-${dt.day}", style: TextStyle(fontSize: 12)),
+                                  Text(
+                                      "${data.authorName} ${data.badge} ${dt.month}-${dt.day}",
+                                      style: TextStyle(fontSize: 12)),
                                   if (data.threadContent.trim().isNotEmpty)
-                                    Column(children: [Padding(padding: EdgeInsets.only(top: 6)), Text(data.threadContent, style: TextStyle(fontSize: 15), maxLines: 3)]),
+                                    Column(children: [
+                                      Padding(padding: EdgeInsets.only(top: 6)),
+                                      Text(data.threadContent,
+                                          style: TextStyle(fontSize: 15),
+                                          maxLines: 3)
+                                    ]),
                                   Padding(padding: EdgeInsets.only(top: 8)),
                                 ],
                               )),

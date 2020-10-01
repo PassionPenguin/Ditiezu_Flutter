@@ -1,8 +1,8 @@
 import 'package:ditiezu_app/app.dart';
+import 'package:ditiezu_app/pages/Home/account_tab.dart';
 import 'package:ditiezu_app/pages/Home/category_tab.dart';
 import 'package:ditiezu_app/pages/Home/discovery_tab.dart';
 import 'package:ditiezu_app/pages/Home/notification_tab.dart';
-import 'package:ditiezu_app/pages/account_tab.dart';
 import 'package:ditiezu_app/utils/ScreenSize.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +16,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   TabController _tabController;
   PageController _pageController;
 
-  int _selectIndex = 0;
+  int _selectIndex = 1;
   bool _isOnTab = false;
 
   TextStyle _defaultStyle = TextStyle(fontSize: 16);
@@ -80,13 +80,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               width: 24, height: 24, placeholder: "assets/images/noavatar_middle.png", image: "http://ditiezu.com/uc_server/avatar.php?mod=avatar&uid=${Application.user.uid}")),
                     ),
                     Tab(
-                      child: Text("发现", style: _selectIndex == 0 ? _selectStyle : _defaultStyle),
+                      child: Text("发现", style: _selectIndex == 1 ? _selectStyle : _defaultStyle),
                     ),
                     Tab(
-                      child: Text("分区", style: _selectIndex == 1 ? _selectStyle : _defaultStyle),
+                      child: Text("分区", style: _selectIndex == 2 ? _selectStyle : _defaultStyle),
                     ),
                     Tab(
-                      child: Text("通知", style: _selectIndex == 2 ? _selectStyle : _defaultStyle),
+                      child: Text("通知", style: _selectIndex == 3 ? _selectStyle : _defaultStyle),
                     ),
                   ]),
             ),
