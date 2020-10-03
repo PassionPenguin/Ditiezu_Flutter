@@ -36,7 +36,7 @@ class _DiscoveryTabState extends State<DiscoveryTab> {
   _contentRetriever() async {
     lw = LoadingWidget(ctx);
     var response =
-        await NetWork(gbkDecoding: true).get("http://www.ditiezu.com/?mod=rss");
+        await NetWork().get("http://www.ditiezu.com/?mod=rss");
     if (homeList.isEmpty) {
       var document = parseXmlDocument(response);
       List<ThreadItem> tmpList = [];

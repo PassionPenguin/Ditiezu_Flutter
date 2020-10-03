@@ -10,7 +10,7 @@ class Toast {
     ft.init(ctx);
     tsf = ft.showToast(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24.0),
             color: accentColor[400],
@@ -22,7 +22,7 @@ class Toast {
               SizedBox(
                 width: 12.0,
               ),
-              Text(message, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              Text(message, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
             ],
           ),
         ),

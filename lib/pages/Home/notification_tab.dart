@@ -35,7 +35,7 @@ class _NotificationTabState extends State<NotificationTab> {
   _contentRetriever() async {
     lw = LoadingWidget(context);
     notificationList = [];
-    var response = await NetWork(gbkDecoding: true, retrieveAsDesktopPage: true).get("http://www.ditiezu.com/home.php?mod=space&do=notice&isread=${isRead ? 1 : 0}");
+    var response = await NetWork().get("http://www.ditiezu.com/home.php?mod=space&do=notice&isread=${isRead ? 1 : 0}");
     var doc = parseHtmlDocument(response);
     if (doc.querySelector(".emp") != null && doc.querySelector(".emp").text.contains("暂时没有新提醒")) {
       lw.onCancel();
@@ -79,7 +79,7 @@ class _NotificationTabState extends State<NotificationTab> {
         else {
           var href = aBracket.attributes["href"];
           if (href.contains("findpost")) {
-            var result = await NetWork(retrieveAsDesktopPage: true).retrieveRedirect(href);
+            var result = await NetWork().retrieveRedirect(href);
             tid = result[0];
             page = result[1];
           } else if (href.contains("thread-")) {

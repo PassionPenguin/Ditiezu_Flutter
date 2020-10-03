@@ -56,11 +56,9 @@ class _LoginPageState extends State<LoginPage> {
         });
   }
 
-  _init(){
-
-        () async {
-      if (await NetWork(retrieveAsDesktopPage: true, gbkDecoding: true)
-          .checkLogin()) {
+  _init() {
+    () async {
+      if (await NetWork().checkLogin()) {
         Toast(context, "正在跳转中",
             accentColor: Colors.lightGreen, icon: CupertinoIcons.check_mark);
         isLoading = false;
@@ -75,13 +73,8 @@ class _LoginPageState extends State<LoginPage> {
       String appDocPath = appDocDir.path;
       var cookieJar = PersistCookieJar(dir: appDocPath + "/.cookies/");
       if (cookieJar.loadForRequest(Uri.http("www.ditiezu.com", "")).isEmpty)
-        await NetWork(retrieveAsDesktopPage: false, gbkDecoding: false)
-            .get("http://www.ditiezu.com/forum.php?mod=forum");
-      var response = await NetWork(
-          retrieveAsDesktopPage: false,
-          gbkDecoding: false,
-          autoRedirect: false)
-          .get(
+        await NetWork().get("http://www.ditiezu.com/forum.php?mod=forum");
+      var response = await NetWork.mobile(autoRedirect: false).get(
           "http://www.ditiezu.com/member.php?mod=logging&action=login&mobile=yes");
       if (response.contains("./?mobile=yes")) {
         Toast(context, "正在跳转中",
@@ -278,23 +271,22 @@ class _LoginPageState extends State<LoginPage> {
   void performLogin() async {
     isLoading = true;
     setState(() {});
-    var response = await NetWork().post("http://www.ditiezu.com/$formAction",
+    var response = await NetWork.mobile(autoRedirect: false).post(
+        "http://www.ditiezu.com/$formAction",
         "formhash=$formHash&referer=http%3A%2F%2Fwww.ditiezu.com%2Fforum.php%3Fmod%3Dforum%26mobile%3Dyes&username=${Uri.encodeComponent(_usrNameController.text)}&password=${Uri.encodeComponent(_pwdController.text)}&sechash=$codeHash&seccodeverify=${Uri.encodeComponent(_codeController.text)}&questionid=$questionID&answer=${Uri.encodeComponent(_questionController.text)}&cookietime=15552000&submit=%E7%99%BB%E5%BD%95");
+    var doc = parseHtmlDocument(response);
     if (response.contains("forum.php?mod=forum") &&
-        !response.contains("<head>")) {
-      Toast(context, "正在跳转中",
-          accentColor: Colors.lightGreen, icon: CupertinoIcons.check_mark);
-      isLoading = false;
-      setState(() {});
-      Future.delayed(Duration(seconds: 2), () {
-        Routes.navigateTo(context, "/home");
-      });
+            !response.contains("<head>") ||
+        doc.querySelector("#messagetext .mbn") == null) {
+      Directory appDocDir = await getApplicationDocumentsDirectory();
+      String appDocPath = appDocDir.path;
+      var cookieJar = PersistCookieJar(dir: appDocPath + "/.cookies/");
+      cookieJar.deleteAll();
+      _init();
       return;
     }
-    var doc = parseHtmlDocument(response);
-    var status =
-        doc.querySelector("#messagetext .mbn").innerHtml.contains("欢迎您回来");
-    Toast(context, doc.querySelector("#messagetext .mbn").innerHtml,
+    var status = doc.querySelector("#messagetext .mbn").text.contains("欢迎您回来");
+    Toast(context, doc.querySelector("#messagetext .mbn").text,
         accentColor: status ? Colors.lightGreen : Colors.red,
         icon: status ? CupertinoIcons.check_mark : CupertinoIcons.clear);
     if (status) {
@@ -311,7 +303,10 @@ class _LoginPageState extends State<LoginPage> {
         Routes.navigateTo(context, "/home");
       });
     }
-    if (doc.querySelector("#messagetext .mbn").innerHtml.contains("验证码填写错误")) {
+    if (doc
+        .querySelector("#messagetext :first-child")
+        .innerHtml
+        .contains("验证码填写错误")) {
       _init();
     }
     isLoading = false;

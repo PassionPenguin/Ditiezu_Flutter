@@ -27,10 +27,13 @@ class _AccountTabState extends State<AccountTab> {
   void initState() {
     () async {
       var response =
-          await NetWork(retrieveAsDesktopPage: true, gbkDecoding: true)
-              .get("http://www.ditiezu.com/home.php?mod=space");
+          await NetWork().get("http://www.ditiezu.com/home.php?mod=space");
       var doc = parseHtmlDocument(response);
-      if(doc.querySelector("#wp").innerHtml.contains('<a id="succeedmessage_href">如果你的浏览器没有自动跳转，请点击此链接</a>'))Routes.navigateTo(context, "/login");
+      if (doc
+          .querySelector("#wp")
+          .innerHtml
+          .contains('<a id="succeedmessage_href">如果你的浏览器没有自动跳转，请点击此链接</a>'))
+        Routes.navigateTo(context, "/login");
       try {
         var pts =
             doc.querySelector("#psts li").text.substring(2).trim().toInt();

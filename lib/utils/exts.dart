@@ -14,10 +14,16 @@ extension Str on String {
   double toDouble() {
     return double.parse(this);
   }
+
+  bool isNumeric() {
+    if (this == null) {
+      return false;
+    }
+    return double.parse(this, (e) => null) != null;
+  }
 }
 
 extension HexColor on Color {
-  /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
   static Color fromHex(String hexString) {
     final buffer = StringBuffer();
     if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
@@ -29,6 +35,7 @@ extension HexColor on Color {
 extension RGBColor on Color {
   static Color fromRGB(String rgbString) {
     var tmp = rgbString.substring(4, rgbString.length - 1).split(",");
-    return Color.fromARGB(255, int.parse(tmp[0]), int.parse(tmp[1]), int.parse(tmp[2]));
+    return Color.fromARGB(
+        255, int.parse(tmp[0]), int.parse(tmp[1]), int.parse(tmp[2]));
   }
 }
