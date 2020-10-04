@@ -68,7 +68,7 @@ SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_native_image: 9c0b7451838484458e5b0fae007b86a4c2d4bdfe
   fluttertoast: 6122fa75143e992b1d3470f61000f591a798cc58
-  image_picker: 39b5e543a921d9072c4ca94d6606aa98cf33d7cd
+  image_picker: cf26c33b8032c6f1feae3b08b4a3c1d2298bda9f
   keyboard_visibility: 96a24de806fe6823c3ad956c01ba2ec6d056616f
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   permission_handler: 8278954f2382902f63f00dd8828769c0bd6d511b

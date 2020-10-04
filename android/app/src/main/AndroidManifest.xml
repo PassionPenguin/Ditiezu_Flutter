@@ -20,7 +20,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:icon="@mipmap/ic_launcher"
-        android:label="ditiezu_app"
+        android:label="Ditiezu"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
         <activity

@@ -145,8 +145,10 @@ class _PostState extends State<Post> {
         });
         if (widget.mode == "SIGHTML")
           Application.sp.setString("SIGHTML_VALUE", controller.text);
-      } else if (str.contains('error'))
+      } else if (str.contains('error')) {
+        submitState = "TRUE";
         Toast(context, response, accentColor: Colors.red, icon: Icons.close);
+      }
     }
   }
 
@@ -260,9 +262,7 @@ class _PostState extends State<Post> {
                               child: Icon(Icons.save, color: Colors.black))),
                       CupertinoButton(
                           onPressed: () {
-                            _onSubmit();
-                            print(submitState);
-                            // if(submitState == "TRUE" ) _onSubmit();
+                            if (submitState == "TRUE") _onSubmit();
                           },
                           child: Padding(
                               padding: EdgeInsets.only(left: 8, right: 8),
@@ -290,7 +290,11 @@ class _PostState extends State<Post> {
                                   setState(() {});
                                 },
                               )),
-                          Expanded(child: CupertinoTextField(decoration: null))
+                          Expanded(
+                              child: CupertinoTextField(
+                            decoration: null,
+                            controller: subjectController,
+                          ))
                         ])),
                     Expanded(
                         child: Container(

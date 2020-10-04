@@ -84,9 +84,9 @@ class NetworkImage
         client = debugNetworkImageHttpClientProvider();
       return true;
     }());
-    client.findProxy = (uri) {
-      return "PROXY 192.168.50.201:8888";
-    };
+    // client.findProxy = (uri) {
+    //   return "PROXY 192.168.50.201:8888";
+    // };
     return client;
   }
 

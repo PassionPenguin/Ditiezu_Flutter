@@ -50,10 +50,9 @@ class NetWork {
       else
         client.userAgent =
             "Mozilla/5.0 (Linux; Android 6.0;) AppleWebKit/537 (KHTML, like Gecko) Chrome/87 Mobile Safari/537";
-      client.findProxy = (uri) {
-        // return "PROXY 127.0.0.1:8888";
-        return "PROXY 192.168.50.201:8888";
-      };
+      // client.findProxy = (uri) {
+      //   return "PROXY 192.168.50.201:8888";
+      // };
       client.badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
     };
