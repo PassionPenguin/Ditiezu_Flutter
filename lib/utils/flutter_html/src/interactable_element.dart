@@ -1,6 +1,6 @@
+import 'package:Ditiezu/utils/flutter_html/src/html_elements.dart';
+import 'package:Ditiezu/utils/flutter_html/style.dart';
 import 'package:flutter/material.dart';
-import 'package:ditiezu_app/utils/flutter_html/src/html_elements.dart';
-import 'package:ditiezu_app/utils/flutter_html/style.dart';
 import 'package:html/dom.dart' as dom;
 
 /// An [InteractableElement] is a [StyledElement] that takes user gestures (e.g. tap).
@@ -21,8 +21,7 @@ enum Gesture {
   TAP,
 }
 
-InteractableElement parseInteractableElement(
-    dom.Element element, List<StyledElement> children) {
+InteractableElement parseInteractableElement(dom.Element element, List<StyledElement> children) {
   InteractableElement interactableElement = InteractableElement(
     name: element.localName,
     children: children,
@@ -31,6 +30,7 @@ InteractableElement parseInteractableElement(
 
   switch (element.localName) {
     case "a":
+      if (element.classes.contains("noHighLight")) break;
       interactableElement.href = element.attributes['href'];
       interactableElement.style = Style(
         color: Colors.blue,

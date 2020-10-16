@@ -1,5 +1,5 @@
-import 'package:ditiezu_app/utils/exts.dart';
-import 'package:ditiezu_app/utils/flutter_html/style.dart';
+import 'package:Ditiezu/utils/exts.dart';
+import 'package:Ditiezu/utils/flutter_html/style.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/src/query_selector.dart';
@@ -32,7 +32,8 @@ class StyledElement {
 
   @override
   String toString() {
-    String selfData = "[$name] ${children?.length ?? 0} ${elementClasses?.isNotEmpty == true ? 'C:${elementClasses.toString()}' : ''}${elementId?.isNotEmpty == true ? 'ID: $elementId' : ''}";
+    String selfData =
+        "[$name] ${children?.length ?? 0} ${elementClasses?.isNotEmpty == true ? 'C:${elementClasses.toString()}' : ''}${elementId?.isNotEmpty == true ? 'ID: $elementId' : ''}";
     children?.forEach((child) {
       selfData += ("\n${child.toString()}").replaceAll(RegExp("^", multiLine: true), "-");
     });
@@ -48,6 +49,9 @@ StyledElement parseStyledElement(dom.Element element, List<StyledElement> childr
     children: children,
     node: element,
   );
+
+  if (element.classes.contains("noStyle")) return styledElement;
+  if (element.classes.contains("xi1")) styledElement.style = Style(color: Colors.orange[600]);
 
   switch (element.localName) {
     case "abbr":
@@ -135,13 +139,21 @@ StyledElement parseStyledElement(dom.Element element, List<StyledElement> childr
     case "del":
       styledElement.style = Style(
         textDecoration: TextDecoration.lineThrough,
+        margin: EdgeInsets.symmetric(vertical: 6),
+        padding: EdgeInsets.symmetric(vertical: 6),
       );
       break;
     case "dfn":
       continue italics;
     case "div":
       if (element.classes.contains("locked"))
-        styledElement.style = Style(border: Border.all(color: Colors.red[200], width: 0.5), margin: EdgeInsets.only(top: 12, bottom: 3), padding: EdgeInsets.all(3), display: Display.BLOCK, fontSize: FontSize.small, color: Colors.grey); // Locked Element
+        styledElement.style = Style(
+            border: Border.all(color: Colors.red[200], width: 0.5),
+            margin: EdgeInsets.only(top: 12, bottom: 3),
+            padding: EdgeInsets.all(3),
+            display: Display.BLOCK,
+            fontSize: FontSize.small,
+            color: Colors.grey); // Locked Element
       else
         styledElement.style = Style(
           margin: EdgeInsets.all(0),
@@ -401,6 +413,8 @@ StyledElement parseStyledElement(dom.Element element, List<StyledElement> childr
       break;
   }
 
+  if(element.id^"rateContainer")styledElement.style.margin = EdgeInsets.only(top: 24);
+  if (element.cssStyle.values["margin"] == "0") styledElement.style.margin = EdgeInsets.all(0);
   return styledElement;
 }
 

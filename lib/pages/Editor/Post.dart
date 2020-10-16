@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
-import 'package:ditiezu_app/Network/NetworkImage.dart' as NetI;
-import 'package:ditiezu_app/Network/network.dart';
-import 'package:ditiezu_app/app.dart';
-import 'package:ditiezu_app/data/EmoticonsData.dart';
-import 'package:ditiezu_app/widgets/w_toast.dart';
+import 'package:Ditiezu/Network/NetworkImage.dart' as NetI;
+import 'package:Ditiezu/Network/network.dart';
+import 'package:Ditiezu/app.dart';
+import 'package:Ditiezu/data/EmoticonsData.dart';
+import 'package:Ditiezu/widgets/w_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import "package:ditiezu_app/Route/routes.dart";
+import "package:Ditiezu/Route/routes.dart";
 import 'package:flutter/rendering.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:path_provider/path_provider.dart';

@@ -1,4 +1,4 @@
-import "package:ditiezu_app/model/EmoticonItem.dart";
+import "package:Ditiezu/model/EmoticonItem.dart";
 
 var emoticonItemsData = [
   EmoticonsItem(

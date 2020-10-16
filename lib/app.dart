@@ -1,4 +1,4 @@
-import 'package:ditiezu_app/provider/user_model.dart';
+import 'package:Ditiezu/provider/user_model.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart' hide Router;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,6 +15,9 @@ class Application {
   static double statusBarHeight;
   static double bottomBarHeight;
   static User user;
+  static const int VERSION_CODE = 1;
+  static const String VERSION_NAME = "0.2.1";
+  static const String CHANNEL = "dev";
 
   static init(context) async {
     sp = await SharedPreferences.getInstance();

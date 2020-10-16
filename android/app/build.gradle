@@ -37,7 +37,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.passionpenguin.ditiezu_app"
+        applicationId "com.passionpenguin.Ditiezu"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()

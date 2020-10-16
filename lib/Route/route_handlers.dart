@@ -1,11 +1,13 @@
 // splash 页面
-import 'package:ditiezu_app/pages/Editor/Post.dart';
-import 'package:ditiezu_app/pages/Editor/UploadImages.dart';
-import 'package:ditiezu_app/pages/Home/home_page.dart';
-import 'package:ditiezu_app/pages/LoginPage.dart';
-import 'package:ditiezu_app/pages/ViewForum.dart';
-import 'package:ditiezu_app/pages/ViewThread.dart';
-import 'package:ditiezu_app/utils/exts.dart';
+import 'package:Ditiezu/pages/Editor/Post.dart';
+import 'package:Ditiezu/pages/Editor/UploadImages.dart';
+import 'package:Ditiezu/pages/Home/home_page.dart';
+import 'package:Ditiezu/pages/License.dart';
+import 'package:Ditiezu/pages/LoginPage.dart';
+import 'package:Ditiezu/pages/OpenSource.dart';
+import 'package:Ditiezu/pages/ViewForum.dart';
+import 'package:Ditiezu/pages/ViewThread/ViewThread.dart';
+import 'package:Ditiezu/utils/exts.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -58,4 +60,15 @@ var uploaderHandler = new Handler(
       params["hash"].first.toString(),
       params["uid"].first.toString().toInt(),
       params["fid"].first.toString().toInt());
+});
+
+var licenseHandler = new Handler(
+    handlerFunc: (BuildContext context, Map<String, List<Object>> params) {
+      return License();
+});
+
+
+var openSourceLicenseHandler = new Handler(
+    handlerFunc: (BuildContext context, Map<String, List<Object>> params) {
+      return OpenSourceLicense();
 });

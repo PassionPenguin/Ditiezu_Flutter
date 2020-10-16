@@ -7,5 +7,7 @@ class NavigateService {
 
   get pushNamed => navigator.pushNamed;
   get push => navigator.push;
+  get pushReplacementNamed => navigator.pushReplacementNamed;
+  get pushReplacement => navigator.pushReplacement;
   get popAndPushNamed => navigator.popAndPushNamed;
 }

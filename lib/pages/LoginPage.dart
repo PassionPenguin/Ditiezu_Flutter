@@ -1,14 +1,14 @@
 import 'dart:io';
 
+import 'package:Ditiezu/Network/network.dart';
+import 'package:Ditiezu/Route/routes.dart';
+import 'package:Ditiezu/app.dart';
+import 'package:Ditiezu/data/arrays.dart';
+import 'package:Ditiezu/model/user.dart';
+import 'package:Ditiezu/provider/user_model.dart';
+import 'package:Ditiezu/widgets/w_input.dart';
+import 'package:Ditiezu/widgets/w_toast.dart';
 import 'package:cookie_jar/cookie_jar.dart';
-import 'package:ditiezu_app/Network/network.dart';
-import 'package:ditiezu_app/Route/routes.dart';
-import 'package:ditiezu_app/app.dart';
-import 'package:ditiezu_app/data/arrays.dart';
-import 'package:ditiezu_app/model/user.dart';
-import 'package:ditiezu_app/provider/user_model.dart';
-import 'package:ditiezu_app/widgets/w_input.dart';
-import 'package:ditiezu_app/widgets/w_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -60,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
     () async {
       if (await NetWork().checkLogin()) {
         Toast(context, "正在跳转中",
-            accentColor: Colors.lightGreen, icon: CupertinoIcons.check_mark);
+            accentColor: Colors.lightGreen, icon: Icons.check);
         isLoading = false;
         setState(() {});
         Future.delayed(Duration(seconds: 2), () {
@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
           "http://www.ditiezu.com/member.php?mod=logging&action=login&mobile=yes");
       if (response.contains("./?mobile=yes")) {
         Toast(context, "正在跳转中",
-            accentColor: Colors.lightGreen, icon: CupertinoIcons.check_mark);
+            accentColor: Colors.lightGreen, icon: Icons.check);
         isLoading = false;
         setState(() {});
         Future.delayed(Duration(seconds: 2), () {
@@ -288,7 +288,7 @@ class _LoginPageState extends State<LoginPage> {
     var status = doc.querySelector("#messagetext .mbn").text.contains("欢迎您回来");
     Toast(context, doc.querySelector("#messagetext .mbn").text,
         accentColor: status ? Colors.lightGreen : Colors.red,
-        icon: status ? CupertinoIcons.check_mark : CupertinoIcons.clear);
+        icon: status ? Icons.check : Icons.clear);
     if (status) {
       var usr = User(
           uid: int.parse(response.substring(

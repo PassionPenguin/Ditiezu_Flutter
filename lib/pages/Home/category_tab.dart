@@ -1,5 +1,5 @@
-import 'package:ditiezu_app/Route/routes.dart';
-import 'package:ditiezu_app/data/CategoryData.dart';
+import 'package:Ditiezu/Route/routes.dart';
+import 'package:Ditiezu/data/CategoryData.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';

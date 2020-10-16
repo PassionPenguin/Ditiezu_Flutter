@@ -1,5 +1,5 @@
-import 'package:ditiezu_app/Route/routes.dart';
-import 'package:ditiezu_app/app.dart';
+import 'package:Ditiezu/Route/routes.dart';
+import 'package:Ditiezu/app.dart';
 import 'package:flutter/material.dart';
 
 class SplashPage extends StatefulWidget {
@@ -35,11 +35,11 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     await Application.init(context);
     if (Application.user != null)
       Future.delayed(Duration(seconds: 2), () {
-        Routes.navigateTo(context, "/home");
+        Routes.navigateTo(context, "/home", clearStack: true);
       });
     else
       Future.delayed(Duration(seconds: 2), () {
-        Routes.navigateTo(context, "/login");
+        Routes.navigateTo(context, "/login", clearStack: true);
       });
   }
 
@@ -59,9 +59,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
           scale: _logoAnimation,
           child: Hero(
             tag: 'logo',
-            child: Stack(
-                children: [Positioned(bottom: 24, child: CircularProgressIndicator())],
-                alignment: Alignment.center),
+            child: Stack(children: [Positioned(bottom: 24, child: CircularProgressIndicator())], alignment: Alignment.center),
           ),
         ),
       ),

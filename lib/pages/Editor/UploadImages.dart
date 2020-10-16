@@ -2,11 +2,11 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:Ditiezu/Network/network.dart';
+import 'package:Ditiezu/Route/routes.dart';
+import 'package:Ditiezu/utils/exts.dart';
+import 'package:Ditiezu/widgets/w_toast.dart';
 import 'package:dio/dio.dart';
-import 'package:ditiezu_app/Network/network.dart';
-import 'package:ditiezu_app/Route/routes.dart';
-import 'package:ditiezu_app/utils/exts.dart';
-import 'package:ditiezu_app/widgets/w_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';

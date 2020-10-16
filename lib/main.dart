@@ -1,5 +1,5 @@
-import 'package:ditiezu_app/Route/routes.dart';
-import 'package:ditiezu_app/pages/InitPage.dart';
+import 'package:Ditiezu/Route/routes.dart';
+import 'package:Ditiezu/pages/InitPage.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart' hide Router;
 import 'package:flutter/material.dart' hide Router;

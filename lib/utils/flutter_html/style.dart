@@ -240,9 +240,7 @@ class Style {
       letterSpacing: other.letterSpacing,
       listStyleType: other.listStyleType,
       padding: other.padding,
-      //TODO merge EdgeInsets
       margin: other.margin,
-      //TODO merge EdgeInsets
       textAlign: other.textAlign,
       textDecoration: other.textDecoration,
       textDecorationColor: other.textDecorationColor,

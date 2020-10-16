@@ -28,10 +28,8 @@ class NetWork {
     "Cache-Control": "max-age=0",
     "Origin": "http://www.ditiezu.com",
     "Upgrade-Insecure-Requests": "1",
-    "Accept":
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-    "Referer":
-        "http://www.ditiezu.com/member.php?mod=logging&action=login&mobile=yes",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+    "Referer": "http://www.ditiezu.com/member.php?mod=logging&action=login&mobile=yes",
     "Connection": "keep-alive"
   };
 
@@ -42,19 +40,15 @@ class NetWork {
     String appDocPath = appDocDir.path;
     var cookieJar = PersistCookieJar(dir: appDocPath + "/.cookies/");
     dio.interceptors.add(CookieManager(cookieJar));
-    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-        (HttpClient client) {
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (HttpClient client) {
       if (retrieveAsDesktopPage)
-        client.userAgent =
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537 (KHTML, like Gecko) Chrome/87 Safari/537";
+        client.userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537 (KHTML, like Gecko) Chrome/87 Safari/537";
       else
-        client.userAgent =
-            "Mozilla/5.0 (Linux; Android 6.0;) AppleWebKit/537 (KHTML, like Gecko) Chrome/87 Mobile Safari/537";
-      // client.findProxy = (uri) {
-      //   return "PROXY 192.168.50.201:8888";
-      // };
-      client.badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+        client.userAgent = "Mozilla/5.0 (Linux; Android 6.0;) AppleWebKit/537 (KHTML, like Gecko) Chrome/87 Mobile Safari/537";
+      client.findProxy = (uri) {
+        return "PROXY 192.168.50.201:8888";
+      };
+      client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
     };
     return dio;
   }
@@ -62,18 +56,20 @@ class NetWork {
   Future<String> get(String url) async {
     log("GET $url");
     dio = await openConn();
-    var result = await dio.get(url,
-        options: Options(
-            responseType: gbkDecoding ? ResponseType.bytes : ResponseType.plain,
-            headers: queryHeaders,
-            followRedirects: false,
-            validateStatus: (code) {
-              return true;
-            }));
+    var result;
+    try {
+      result = await dio.get(url,
+          options: Options(
+              responseType: gbkDecoding ? ResponseType.bytes : ResponseType.plain,
+              headers: queryHeaders,
+              followRedirects: false,
+              validateStatus: (code) {
+                return true;
+              }));
+    } catch (e) {}
     if (result.statusCode >= 300 && result.statusCode <= 399) {
       if (autoRedirect) {
-        result = await dio
-            .get("http://www.ditiezu.com" + result.headers["location"][0]);
+        result = await dio.get("http://www.ditiezu.com" + result.headers["location"][0]);
       } else
         return result.headers["location"][0];
     }
@@ -84,19 +80,22 @@ class NetWork {
     log("POST $url");
     dio = await openConn();
     dio.options.contentType = "application/x-www-form-urlencoded";
-    var result = await dio.post(url,
-        data: formData,
-        options: Options(
-            responseType: gbkDecoding ? ResponseType.bytes : ResponseType.plain,
-            headers: queryHeaders,
-            followRedirects: false,
-            validateStatus: (code) {
-              return true;
-            }));
+
+    var result;
+    try {
+      result = await dio.post(url,
+          data: formData,
+          options: Options(
+              responseType: gbkDecoding ? ResponseType.bytes : ResponseType.plain,
+              headers: queryHeaders,
+              followRedirects: false,
+              validateStatus: (code) {
+                return true;
+              }));
+    } catch (e) {}
     if (result.statusCode >= 300 && result.statusCode <= 399) {
       if (autoRedirect) {
-        result = await dio
-            .get("http://www.ditiezu.com" + result.headers["location"][0]);
+        result = await dio.get("http://www.ditiezu.com" + result.headers["location"][0]);
       } else
         return result.headers["location"][0];
     }
@@ -106,19 +105,22 @@ class NetWork {
   Future<String> postMultipart(String url, FormData formData) async {
     log("POST $url");
     dio = await openConn();
-    var result = await dio.post(url,
-        data: formData,
-        options: Options(
-            responseType: gbkDecoding ? ResponseType.bytes : ResponseType.plain,
-            headers: queryHeaders,
-            followRedirects: false,
-            validateStatus: (code) {
-              return true;
-            }));
+
+    var result;
+    try {
+      result = await dio.post(url,
+          data: formData,
+          options: Options(
+              responseType: gbkDecoding ? ResponseType.bytes : ResponseType.plain,
+              headers: queryHeaders,
+              followRedirects: false,
+              validateStatus: (code) {
+                return true;
+              }));
+    } catch (e) {}
     if (result.statusCode >= 300 && result.statusCode <= 399) {
       if (autoRedirect) {
-        result = await dio
-            .get("http://www.ditiezu.com" + result.headers["location"][0]);
+        result = await dio.get("http://www.ditiezu.com" + result.headers["location"][0]);
       } else
         return result.headers["location"][0];
     }
@@ -128,32 +130,29 @@ class NetWork {
   Future<List<String>> retrieveRedirect(String url) async {
     log("GET $url");
     dio = await openConn();
-    var result = await dio.get(url,
-        options: Options(
-            responseType: gbkDecoding ? ResponseType.bytes : ResponseType.plain,
-            headers: queryHeaders,
-            followRedirects: false,
-            validateStatus: (code) {
-              return true;
-            }));
+
+    var result;
+    try {
+      result = await dio.get(url,
+          options: Options(
+              responseType: gbkDecoding ? ResponseType.bytes : ResponseType.plain,
+              headers: queryHeaders,
+              followRedirects: false,
+              validateStatus: (code) {
+                return true;
+              }));
+    } catch (e) {}
     if (result.statusCode >= 300 && result.statusCode <= 399) {
       var href = result.headers["location"][0];
-      var tid = href.substring(href.indexOf("tid=") + 4,
-          href.indexOf("&", href.indexOf("tid=") + 4));
-      var page = href.substring(href.indexOf("page=") + 5,
-          href.indexOf("#", href.indexOf("page=") + 5));
+      var tid = href.substring(href.indexOf("tid=") + 4, href.indexOf("&", href.indexOf("tid=") + 4));
+      var page = href.substring(href.indexOf("page=") + 5, href.indexOf("#", href.indexOf("page=") + 5));
       return [tid, page];
     }
     return ["-1", "1"];
   }
 
   Future<bool> checkLogin() async {
-    return parseHtmlDocument(
-                    await get("http://www.ditiezu.com/forum.php?gid=149"))
-                .querySelector("#lsform") ==
-            null
-        ? true
-        : false;
+    return parseHtmlDocument(await get("http://www.ditiezu.com/forum.php?gid=149")).querySelector("#lsform") == null ? true : false;
   }
 
   log(msg) {
@@ -176,18 +175,9 @@ class UrlEncode {
       ch = str[i];
       val = str.codeUnitAt(i);
       if (val >= 0x4e00 && val < 0x9FA5) {
-        if ((pos = _gbhz.indexOf(ch)) != -1)
-          ret += ("%" +
-                  (0xB0 + pos ~/ 94).toRadixString(16) +
-                  "%" +
-                  (0xA1 + pos % 94).toRadixString(16))
-              .toUpperCase();
+        if ((pos = _gbhz.indexOf(ch)) != -1) ret += ("%" + (0xB0 + pos ~/ 94).toRadixString(16) + "%" + (0xA1 + pos % 94).toRadixString(16)).toUpperCase();
       } else if ((pos = _gbfh.indexOf(ch)) != -1)
-        ret += ("%" +
-                (0xA1 + pos ~/ 94).toRadixString(16) +
-                "%" +
-                (0xA1 + pos % 94).toRadixString(16))
-            .toUpperCase();
+        ret += ("%" + (0xA1 + pos ~/ 94).toRadixString(16) + "%" + (0xA1 + pos % 94).toRadixString(16)).toUpperCase();
       else if (strSpecial.indexOf(ch) != -1)
         ret += "%" + val.toRadixString(16);
       else if (ch == " ")

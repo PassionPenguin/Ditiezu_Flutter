@@ -1,4 +1,4 @@
-# ditiezu_app
+# Ditiezu
 
 Ditiezu
 

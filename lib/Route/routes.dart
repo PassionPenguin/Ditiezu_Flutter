@@ -1,4 +1,4 @@
-import 'package:ditiezu_app/Route/route_handlers.dart';
+import 'package:Ditiezu/Route/route_handlers.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart' hide Router;
 
@@ -11,6 +11,8 @@ class Routes {
   static String thread = "/thread";
   static String post = "/post";
   static String uploader = "/uploader";
+  static String license = "/license";
+  static String openSourceLicense = "/openSourceLicense";
 
   // 配置route
   static void configureRoutes(Router router) {
@@ -26,9 +28,12 @@ class Routes {
     router.define(thread, handler: threadHandler);
     router.define(post, handler: postHandler);
     router.define(uploader, handler: uploaderHandler);
+    router.define(license, handler: licenseHandler);
+    router.define(openSourceLicense, handler: openSourceLicenseHandler);
   }
 
-  static Future navigateTo(BuildContext context, String path, {Map<String, dynamic> params, TransitionType transition = TransitionType.native}) {
+  static Future navigateTo(BuildContext context, String path,
+      {Map<String, dynamic> params, TransitionType transition = TransitionType.native, clearStack = false}) {
     String query = "";
     if (params != null) {
       int index = 0;
@@ -45,7 +50,7 @@ class Routes {
     }
 
     path = path + query;
-    return router.navigateTo(context, path, transition: transition);
+    return router.navigateTo(context, path, transition: transition, clearStack: clearStack);
   }
 
   static void pop(BuildContext context) {

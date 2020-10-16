@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:ditiezu_app/app.dart';
-import 'package:ditiezu_app/model/user.dart';
+import 'package:Ditiezu/app.dart';
+import 'package:Ditiezu/model/user.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
