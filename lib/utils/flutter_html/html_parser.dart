@@ -1,14 +1,14 @@
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:Ditiezu/utils/flutter_html/flutter_html.dart';
+import 'package:Ditiezu/utils/flutter_html/src/html_elements.dart';
+import 'package:Ditiezu/utils/flutter_html/src/layout_element.dart';
+import 'package:Ditiezu/utils/flutter_html/src/utils.dart';
+import 'package:Ditiezu/utils/flutter_html/style.dart';
 import 'package:csslib/parser.dart' as cssparser;
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/material.dart';
-import 'package:ditiezu_app/utils/flutter_html/flutter_html.dart';
-import 'package:ditiezu_app/utils/flutter_html/src/html_elements.dart';
-import 'package:ditiezu_app/utils/flutter_html/src/layout_element.dart';
-import 'package:ditiezu_app/utils/flutter_html/src/utils.dart';
-import 'package:ditiezu_app/utils/flutter_html/style.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as htmlparser;
 

@@ -1,16 +1,16 @@
+import 'package:Ditiezu/widgets/w_toast/w_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart' hide Toast;
 
 class Toast {
-  ToastStateFul tsf;
+  var ft = new FToast();
 
-  Toast(BuildContext ctx, String message, {MaterialColor accentColor = Colors.lightGreen, IconData icon = CupertinoIcons.check_mark}) {
-    var ft = FToast();
+  Toast(BuildContext ctx, String message, {MaterialColor accentColor = Colors.lightGreen, IconData icon = Icons.check}) {
+    print(message);
     ft.init(ctx);
-    tsf = ft.showToast(
+    ft.showToast(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24.0),
             color: accentColor[400],
@@ -22,11 +22,11 @@ class Toast {
               SizedBox(
                 width: 12.0,
               ),
-              Text(message, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              Text(message, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
             ],
           ),
         ),
-        toastDuration: Duration(seconds: 2),
+        // toastDuration: Duration(seconds: 2),
         positionedToastBuilder: (context, child) {
           return Positioned(
             child: child,
@@ -35,9 +35,12 @@ class Toast {
             right: 0,
           );
         });
+    Future.delayed(Duration(seconds: 2), () {
+      ft.remove();
+    });
   }
 
-  void hideIt() {
-    tsf.hideIt();
+  void onCancel() {
+    ft.remove();
   }
 }

@@ -1,4 +1,4 @@
-import 'package:ditiezu_app/model/SelectItem.dart';
+import 'package:Ditiezu/model/SelectItem.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 

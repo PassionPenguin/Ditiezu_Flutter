@@ -1,9 +1,9 @@
-import 'package:ditiezu_app/app.dart';
-import 'package:ditiezu_app/pages/Home/account_tab.dart';
-import 'package:ditiezu_app/pages/Home/category_tab.dart';
-import 'package:ditiezu_app/pages/Home/discovery_tab.dart';
-import 'package:ditiezu_app/pages/Home/notification_tab.dart';
-import 'package:ditiezu_app/utils/ScreenSize.dart';
+import 'package:Ditiezu/app.dart';
+import 'package:Ditiezu/pages/Home/account_tab.dart';
+import 'package:Ditiezu/pages/Home/category_tab.dart';
+import 'package:Ditiezu/pages/Home/discovery_tab.dart';
+import 'package:Ditiezu/pages/Home/notification_tab.dart';
+import 'package:Ditiezu/utils/ScreenSize.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

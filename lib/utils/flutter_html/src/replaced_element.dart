@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:ditiezu_app/utils/flutter_html/html_parser.dart';
-import 'package:ditiezu_app/utils/flutter_html/src/html_elements.dart';
-import 'package:ditiezu_app/utils/flutter_html/src/utils.dart';
-import 'package:ditiezu_app/utils/flutter_html/style.dart';
+import 'package:Ditiezu/utils/flutter_html/html_parser.dart';
+import 'package:Ditiezu/utils/flutter_html/src/html_elements.dart';
+import 'package:Ditiezu/utils/flutter_html/src/utils.dart';
+import 'package:Ditiezu/utils/flutter_html/style.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -19,16 +19,11 @@ import 'package:html/dom.dart' as dom;
 abstract class ReplacedElement extends StyledElement {
   PlaceholderAlignment alignment;
 
-  ReplacedElement({String name,
-    Style style,
-    dom.Element node,
-    this.alignment = PlaceholderAlignment.aboveBaseline})
+  ReplacedElement({String name, Style style, dom.Element node, this.alignment = PlaceholderAlignment.aboveBaseline})
       : super(name: name, children: null, style: style, node: node);
 
   static List<String> parseMediaSources(List<dom.Element> elements) {
-    return elements
-        .where((element) => element.localName == 'source')
-        .map((element) {
+    return elements.where((element) => element.localName == 'source').map((element) {
       return element.attributes['src'];
     }).toList();
   }
@@ -73,6 +68,9 @@ class ImageContentElement extends ReplacedElement {
   @override
   Widget toWidget(RenderContext context) {
     Widget imageWidget;
+
+    bool isScoreAvatar = element.classes.contains("score_avatar");
+
     if (src == null) {
       imageWidget = Text(alt ?? "", style: context.style.generateTextStyle());
     } else if (src.startsWith("data:image") && src.contains("base64,")) {
@@ -84,15 +82,30 @@ class ImageContentElement extends ReplacedElement {
           context.parser.onImageError?.call(exception, stackTrace);
         },
       );
-      imageWidget = Image.memory(
-        decodedImage,
-        frameBuilder: (ctx, child, frame, _) {
-          if (frame == null) {
-            return Text(alt ?? "", style: context.style.generateTextStyle());
-          }
-          return child;
-        },
-      );
+      if (isScoreAvatar)
+        imageWidget = ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.memory(
+              decodedImage,
+              width: 18,
+              height: 18,
+              frameBuilder: (ctx, child, frame, _) {
+                if (frame == null) {
+                  return Text(alt ?? "", style: TextStyle(height: 1.71));
+                }
+                return child;
+              },
+            ));
+      else
+        imageWidget = Image.memory(
+          decodedImage,
+          frameBuilder: (ctx, child, frame, _) {
+            if (frame == null) {
+              return Text(alt ?? "", style: context.style.generateTextStyle());
+            }
+            return child;
+          },
+        );
     } else if (src.startsWith("asset:")) {
       final assetPath = src.replaceFirst('asset:', '');
       precacheImage(
@@ -112,26 +125,25 @@ class ImageContentElement extends ReplacedElement {
         },
       );
     } else {
-      precacheImage(
-        NetworkImage(src, headers: {
-          "cookie": cookie
-        }),
-        context.buildContext,
-        onError: (exception, StackTrace stackTrace) {
-          context.parser.onImageError?.call(exception, stackTrace);
-        },
-      );
-      imageWidget = Image.network(
-          src,
-          frameBuilder: (ctx, child, frame, _) {
-            if (frame == null) {
-              return Text(alt ?? "", style: context.style.generateTextStyle());
-            }
-            return child;
-          }, headers: {
-        "cookie": cookie
-      }
-      );
+      precacheImage(NetworkImage(src, headers: {"cookie": cookie}), context.buildContext, onError: (exception, StackTrace stackTrace) {
+        context.parser.onImageError?.call(exception, stackTrace);
+      });
+      if (isScoreAvatar)
+        imageWidget = ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(src, width: 18, height: 18, frameBuilder: (ctx, child, frame, _) {
+              if (frame == null) {
+                return Text(alt ?? "", style: TextStyle(height: 1.71));
+              }
+              return child;
+            }, headers: {"cookie": cookie}));
+      else
+        imageWidget = Image.network(src, frameBuilder: (ctx, child, frame, _) {
+          if (frame == null) {
+            return Text(alt ?? "", style: context.style.generateTextStyle());
+          }
+          return child;
+        }, headers: {"cookie": cookie});
     }
 
     return ContainerSpan(
@@ -141,10 +153,9 @@ class ImageContentElement extends ReplacedElement {
       child: RawGestureDetector(
         child: imageWidget,
         gestures: {
-          MultipleTapGestureRecognizer: GestureRecognizerFactoryWithHandlers<
-              MultipleTapGestureRecognizer>(
-                () => MultipleTapGestureRecognizer(),
-                (instance) {
+          MultipleTapGestureRecognizer: GestureRecognizerFactoryWithHandlers<MultipleTapGestureRecognizer>(
+            () => MultipleTapGestureRecognizer(),
+            (instance) {
               instance..onTap = () => context.parser.onImageTap?.call(src);
             },
           ),
@@ -186,8 +197,7 @@ class EmptyContentElement extends ReplacedElement {
 class RubyElement extends ReplacedElement {
   dom.Element element;
 
-  RubyElement({@required this.element, String name = "ruby"})
-      : super(name: name, alignment: PlaceholderAlignment.middle);
+  RubyElement({@required this.element, String name = "ruby"}) : super(name: name, alignment: PlaceholderAlignment.middle);
 
   @override
   Widget toWidget(RenderContext context) {
@@ -209,15 +219,9 @@ class RubyElement extends ReplacedElement {
                   alignment: Alignment.bottomCenter,
                   child: Center(
                       child: Transform(
-                          transform:
-                          Matrix4.translationValues(0, -(rubyYPos), 0),
-                          child: Text(c.innerHtml,
-                              style: context.style
-                                  .generateTextStyle()
-                                  .copyWith(fontSize: rubySize))))),
-              Container(
-                  child: Text(textNode.text.trim(),
-                      style: context.style.generateTextStyle())),
+                          transform: Matrix4.translationValues(0, -(rubyYPos), 0),
+                          child: Text(c.innerHtml, style: context.style.generateTextStyle().copyWith(fontSize: rubySize))))),
+              Container(child: Text(textNode.text.trim(), style: context.style.generateTextStyle())),
             ],
           );
           widgets.add(widget);
@@ -241,13 +245,7 @@ ReplacedElement parseReplacedElement(dom.Element element, String cookie) {
         style: Style(whiteSpace: WhiteSpace.PRE),
       );
     case "img":
-      return ImageContentElement(
-        name: "img",
-        src: element.attributes['src'],
-        alt: element.attributes['alt'],
-        node: element,
-        cookie: cookie
-      );
+      return ImageContentElement(name: "img", src: element.attributes['src'], alt: element.attributes['alt'], node: element, cookie: cookie);
     case "svg":
       return SvgContentElement(
         data: element.outerHtml,
@@ -265,8 +263,7 @@ ReplacedElement parseReplacedElement(dom.Element element, String cookie) {
 
 // TODO(Sub6Resources): Remove when https://github.com/flutter/flutter/issues/36304 is resolved
 class PlatformViewVerticalGestureRecognizer extends VerticalDragGestureRecognizer {
-  PlatformViewVerticalGestureRecognizer({PointerDeviceKind kind})
-      : super(kind: kind);
+  PlatformViewVerticalGestureRecognizer({PointerDeviceKind kind}) : super(kind: kind);
 
   Offset _dragDistance = Offset.zero;
 

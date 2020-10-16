@@ -1,5 +1,5 @@
-import 'package:ditiezu_app/model/SelectItem.dart';
-import 'package:ditiezu_app/utils/dropdown_menu/_src/drapdown_common.dart';
+import 'package:Ditiezu/model/SelectItem.dart';
+import 'package:Ditiezu/utils/dropdown_menu/_src/drapdown_common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 

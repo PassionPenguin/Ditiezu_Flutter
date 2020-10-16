@@ -1,11 +1,12 @@
-import 'package:ditiezu_app/Network/network.dart';
-import 'package:ditiezu_app/Route/routes.dart';
-import 'package:ditiezu_app/data/CategoryData.dart';
-import 'package:ditiezu_app/model/CategoryItem.dart';
-import 'package:ditiezu_app/model/SelectItem.dart';
-import 'package:ditiezu_app/model/ThreadItem.dart';
-import 'package:ditiezu_app/utils/dropdown_menu/dropdown_menu.dart';
-import 'package:ditiezu_app/widgets/w_loading.dart';
+import 'package:Ditiezu/Network/network.dart';
+import 'package:Ditiezu/Route/routes.dart';
+import 'package:Ditiezu/data/CategoryData.dart';
+import 'package:Ditiezu/model/CategoryItem.dart';
+import 'package:Ditiezu/model/SelectItem.dart';
+import 'package:Ditiezu/model/ThreadItem.dart';
+import 'package:Ditiezu/utils/dropdown_menu/dropdown_menu.dart';
+import 'package:Ditiezu/widgets/w_loading.dart';
+import 'package:Ditiezu/widgets/w_radius_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:universal_html/parsing.dart';
@@ -29,14 +30,11 @@ class _ViewForumState extends State<ViewForum> {
   int fid;
   CategoryItem cur;
 
+  LoadingWidget lw;
+
   List<SelectItem> _typesList = [SelectItem.full(name: "全部", isSelected: true, id: -1)];
   SelectItem selectedType = SelectItem.full(name: "全部", isSelected: true, id: -1);
 
-  /*
-    SEE ../../docs/ViewThread.md
-   */
-
-  // ["dateline", "replies", "views", "lastpost", "heats"];
   bool typeID = false;
   String filter = "";
   List<String> filtersParam = [
@@ -70,7 +68,9 @@ class _ViewForumState extends State<ViewForum> {
 
   @override
   void initState() {
-    _contentResolver();
+    Future.delayed(Duration(seconds: 1), () {
+      _contentResolver();
+    });
     super.initState();
   }
 
@@ -105,7 +105,7 @@ class _ViewForumState extends State<ViewForum> {
                     child: Stack(key: globalKey, children: [
                   ListView.builder(
                       itemBuilder: (BuildContext ctx, int index) {
-                        if (index == forumList.length) {
+                        if (index == forumList.length)
                           return Container(
                               margin: EdgeInsets.symmetric(vertical: 16),
                               alignment: Alignment.topCenter,
@@ -113,7 +113,7 @@ class _ViewForumState extends State<ViewForum> {
                                 Offstage(
                                     offstage: !(currentPage >= 2),
                                     child: radiusButton(
-                                        child: Icon(CupertinoIcons.back, size: 18),
+                                        child: Icon(Icons.chevron_left, size: 18),
                                         action: () {
                                           currentPage--;
                                           _contentResolver();
@@ -141,7 +141,7 @@ class _ViewForumState extends State<ViewForum> {
                                         child: Text((currentPage + 1).toString()),
                                         action: () {
                                           currentPage++;
-                                          setState(() {});
+                                          _contentResolver();
                                         })),
                                 Offstage(
                                     offstage: !(currentPage <= pages - 2),
@@ -154,23 +154,32 @@ class _ViewForumState extends State<ViewForum> {
                                 Offstage(
                                     offstage: !(currentPage <= pages - 1),
                                     child: radiusButton(
-                                        child: Icon(CupertinoIcons.forward, size: 18),
+                                        child: Icon(Icons.chevron_right, size: 18),
                                         action: () {
                                           currentPage++;
                                           _contentResolver();
                                         })),
                               ]));
-                        }
+                        else if (index >= forumList.length) return Container();
                         var data = forumList[index];
                         var dt = data.pubDate;
                         TextSpan tp = () {
                           var c = <InlineSpan>[];
                           c.add(TextSpan(text: data.badge, style: TextStyle(fontSize: 18.5, fontWeight: FontWeight.w400, color: Colors.lightBlue)));
                           c.add(TextSpan(text: data.threadTitle, style: TextStyle(fontSize: 18.5, fontWeight: FontWeight.w600, color: Colors.black87)));
-                          if (data.isNew) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_new.png", height: 14))));
-                          if (data.isHot) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_hot.png", height: 14))));
-                          if (data.withImage) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_image.png", height: 14))));
-                          if (data.withAttachment) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_attachment.png", height: 14))));
+                          if (data.isNew)
+                            c.add(WidgetSpan(
+                                child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_new.png", height: 14))));
+                          if (data.isHot)
+                            c.add(WidgetSpan(
+                                child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_hot.png", height: 14))));
+                          if (data.withImage)
+                            c.add(WidgetSpan(
+                                child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_image.png", height: 14))));
+                          if (data.withAttachment)
+                            c.add(WidgetSpan(
+                                child:
+                                    Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_attachment.png", height: 14))));
                           return TextSpan(children: c);
                         }();
                         return SafeArea(
@@ -208,6 +217,14 @@ class _ViewForumState extends State<ViewForum> {
                                     ]))));
                       },
                       itemCount: forumList.length + 1),
+                  Positioned(
+                      right: 24,
+                      bottom: 24,
+                      child: FloatingActionButton(
+                          onPressed: () {
+                            Routes.navigateTo(context, "/post", params: {"mode": "NEW", "fid": fid.toString()});
+                          },
+                          child: Icon(Icons.add))),
                   DropdownMenu(maxMenuHeight: kDropdownMenuItemHeight * 10,
                       //  activeIndex: activeIndex,
                       menus: [
@@ -256,9 +273,9 @@ class _ViewForumState extends State<ViewForum> {
   }
 
   _contentResolver() {
-    var lw = LoadingWidget(context);
+    lw = LoadingWidget(context);
     () async {
-      var response = await NetWork(retrieveAsDesktopPage: true, gbkDecoding: true).get("http://www.ditiezu.com/forum.php?mod=forumdisplay&fid=$fid&page=$currentPage" + queryParams());
+      var response = await NetWork().get("http://www.ditiezu.com/forum.php?mod=forumdisplay&fid=$fid&page=$currentPage" + queryParams());
       var document = parseHtmlDocument(response);
       if (document.querySelector("#pgt .pg") != null) {
         pages = int.parse(document.querySelector("#pgt .pg").querySelectorAll("*:not(.nxt)").last.text.replaceFirst("... ", ""));
@@ -298,21 +315,14 @@ class _ViewForumState extends State<ViewForum> {
             element.querySelector("[alt='attachment']") != null));
       });
       forumList = tmpList;
-      try {
-        lw.onCancel();
-      } catch (e) {}
       setState(() {});
+      lw.onCancel();
     }();
   }
-}
 
-Widget radiusButton({Widget child, GestureTapCallback action, bool colored = true}) {
-  return GestureDetector(
-      child: Container(
-          margin: EdgeInsets.symmetric(horizontal: 3),
-          width: 30,
-          height: 30,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(6.0), color: colored ? Color(0xFFEEEEEE) : Colors.transparent),
-          child: Center(child: child)),
-      onTap: action);
+  @override
+  void dispose() {
+    lw.onCancel();
+    super.dispose();
+  }
 }

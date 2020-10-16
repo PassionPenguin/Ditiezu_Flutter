@@ -1,8 +1,8 @@
 library flutter_html;
 
+import 'package:Ditiezu/utils/flutter_html/html_parser.dart';
+import 'package:Ditiezu/utils/flutter_html/style.dart';
 import 'package:flutter/material.dart';
-import 'package:ditiezu_app/utils/flutter_html/html_parser.dart';
-import 'package:ditiezu_app/utils/flutter_html/style.dart';
 
 class Html extends StatelessWidget {
   /// The `Html` widget takes HTML as input and displays a RichText

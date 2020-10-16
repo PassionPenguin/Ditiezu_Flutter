@@ -1,4 +1,4 @@
-import 'package:ditiezu_app/model/CategoryItem.dart';
+import 'package:Ditiezu/model/CategoryItem.dart';
 
 var categoryList = [
   CategoryItem("北京区", "地下通衢肇始燕，铁流暗涌古城垣。北畅南达东西贯，京都旧貌换新颜。", "assets/images/categoryIcons/beijing.svg", 7),

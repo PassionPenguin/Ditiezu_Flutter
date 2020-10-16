@@ -1,9 +1,9 @@
-import 'package:ditiezu_app/Network/network.dart';
-import 'package:ditiezu_app/Route/routes.dart';
-import 'package:ditiezu_app/model/NotificationItem.dart';
-import 'package:ditiezu_app/widgets/v_empty_view.dart';
-import 'package:ditiezu_app/widgets/w_loading.dart';
-import 'package:ditiezu_app/widgets/w_toast.dart';
+import 'package:Ditiezu/Network/network.dart';
+import 'package:Ditiezu/Route/routes.dart';
+import 'package:Ditiezu/model/NotificationItem.dart';
+import 'package:Ditiezu/widgets/v_empty_view.dart';
+import 'package:Ditiezu/widgets/w_loading.dart';
+import 'package:Ditiezu/widgets/w_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:universal_html/parsing.dart';
@@ -35,7 +35,7 @@ class _NotificationTabState extends State<NotificationTab> {
   _contentRetriever() async {
     lw = LoadingWidget(context);
     notificationList = [];
-    var response = await NetWork(gbkDecoding: true, retrieveAsDesktopPage: true).get("http://www.ditiezu.com/home.php?mod=space&do=notice&isread=${isRead ? 1 : 0}");
+    var response = await NetWork().get("http://www.ditiezu.com/home.php?mod=space&do=notice&isread=${isRead ? 1 : 0}");
     var doc = parseHtmlDocument(response);
     if (doc.querySelector(".emp") != null && doc.querySelector(".emp").text.contains("暂时没有新提醒")) {
       lw.onCancel();
@@ -59,8 +59,9 @@ class _NotificationTabState extends State<NotificationTab> {
         }
         var aBracket = it.querySelector(".ntc_body a:last-child");
         aBrackets.add(aBracket);
-        imageUrls
-            .add(it.querySelector("img").attributes["src"].contains("systempm") ? "http://www.ditiezu.com/" + it.querySelector("img").attributes["src"] : it.querySelector("img").attributes["src"]);
+        imageUrls.add(it.querySelector("img").attributes["src"].contains("systempm")
+            ? "http://www.ditiezu.com/" + it.querySelector("img").attributes["src"]
+            : it.querySelector("img").attributes["src"]);
         values.add(it.querySelector(".ntc_body").text);
         descriptions.add(quote);
         times.add(it.querySelector("dt span").text);
@@ -79,7 +80,7 @@ class _NotificationTabState extends State<NotificationTab> {
         else {
           var href = aBracket.attributes["href"];
           if (href.contains("findpost")) {
-            var result = await NetWork(retrieveAsDesktopPage: true).retrieveRedirect(href);
+            var result = await NetWork().retrieveRedirect(href);
             tid = result[0];
             page = result[1];
           } else if (href.contains("thread-")) {
@@ -92,12 +93,11 @@ class _NotificationTabState extends State<NotificationTab> {
         pages.add(page);
       }
       for (int i = 0; i < aBrackets.length; i++)
-        notificationList.add(NotificationItem(imageUrl: imageUrls[i], value: values[i], description: descriptions[i], time: times[i], tid: tids[i], page: pages[i]));
+        notificationList
+            .add(NotificationItem(imageUrl: imageUrls[i], value: values[i], description: descriptions[i], time: times[i], tid: tids[i], page: pages[i]));
       setState(() {});
-    }();
-    try {
       lw.onCancel();
-    } catch (e) {}
+    }();
   }
 
   Widget _contentResolver(BuildContext context) {
@@ -160,8 +160,12 @@ class _NotificationTabState extends State<NotificationTab> {
                                       child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Padding(padding: EdgeInsets.only(left: 8), child: Text(data.value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600))),
-                                      data.description != null ? Padding(padding: EdgeInsets.only(top: 4, left: 8), child: Text(data.description)) : VEmptyView(0),
+                                      Padding(
+                                          padding: EdgeInsets.only(left: 8),
+                                          child: Text(data.value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600))),
+                                      data.description != null
+                                          ? Padding(padding: EdgeInsets.only(top: 4, left: 8), child: Text(data.description))
+                                          : VEmptyView(0),
                                       Padding(padding: EdgeInsets.only(top: 4, left: 8), child: Text(data.time, style: TextStyle(fontSize: 12))),
                                     ],
                                   )),

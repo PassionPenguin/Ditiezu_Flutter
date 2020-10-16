@@ -1,8 +1,9 @@
+import "package:Ditiezu/utils/exts.dart";
+import 'package:Ditiezu/utils/flutter_html/html_parser.dart';
+import 'package:Ditiezu/utils/flutter_html/src/html_elements.dart';
+import 'package:Ditiezu/utils/flutter_html/src/styled_element.dart';
+import 'package:Ditiezu/utils/flutter_html/style.dart';
 import 'package:flutter/material.dart';
-import 'package:ditiezu_app/utils/flutter_html/html_parser.dart';
-import 'package:ditiezu_app/utils/flutter_html/src/html_elements.dart';
-import 'package:ditiezu_app/utils/flutter_html/src/styled_element.dart';
-import 'package:ditiezu_app/utils/flutter_html/style.dart';
 import 'package:html/dom.dart' as dom;
 
 /// A [LayoutElement] is an element that breaks the normal Inline flow of
@@ -34,9 +35,7 @@ class TableLayoutElement extends LayoutElement {
           return group.children.where((c) => c.name == "col").map((c) {
             final widthStr = c.attributes["width"] ?? "";
             if (widthStr.endsWith("%")) {
-              final width =
-                  double.tryParse(widthStr.substring(0, widthStr.length - 1)) *
-                      0.01;
+              final width = double.tryParse(widthStr.substring(0, widthStr.length - 1)) * 0.01;
               return FractionColumnWidth(width);
             } else {
               final width = double.tryParse(widthStr);
@@ -110,6 +109,33 @@ class TableRowLayoutElement extends LayoutElement {
   }
 
   TableRow toTableRow(RenderContext context) {
+    if (element.id ^ "rate_") {
+      return TableRow(
+          decoration: BoxDecoration(
+            border: style.border,
+            color: style.backgroundColor,
+          ),
+          children: children
+              .map((c) {
+                if (c is StyledElement && c.name == 'td' || c.name == 'th') {
+                  return TableCell(
+                      child: Container(
+                          height: 24,
+                          margin: EdgeInsets.symmetric(vertical: 4),
+                          decoration: BoxDecoration(
+                            color: c.style.backgroundColor,
+                            border: c.style.border,
+                          ),
+                          child: StyledText(
+                            textSpan: context.parser.parseTree(context, c),
+                            style: Style(height: 36, verticalAlign: VerticalAlign.BASELINE),
+                          )));
+                }
+                return null;
+              })
+              .where((c) => c != null)
+              .toList());
+    }
     return TableRow(
         decoration: BoxDecoration(
           border: style.border,
