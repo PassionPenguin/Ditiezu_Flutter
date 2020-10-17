@@ -1,8 +1,9 @@
-import 'package:Ditiezu/Route/routes.dart';
-import 'package:Ditiezu/pages/InitPage.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart' hide Router;
 import 'package:flutter/material.dart' hide Router;
+
+import 'Pages/StartupPage.dart';
+import 'Route/Routes.dart';
 
 void main() {
   final router = Router();

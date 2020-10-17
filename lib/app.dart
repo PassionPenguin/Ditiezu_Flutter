@@ -1,10 +1,10 @@
-import 'package:Ditiezu/provider/user_model.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart' hide Router;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'model/user.dart';
+import 'Models/User.dart';
+import 'Provider/UserModel.dart';
 
 class Application {
   static Router router;
