@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:universal_html/parsing.dart';
@@ -23,14 +22,14 @@ class AccountTab extends StatefulWidget {
 
 class _AccountTabState extends State<AccountTab> {
   String lv = "";
-  int pts;
-  int prestige;
-  int money;
-  int mScore;
-  int popularity;
-  int friends;
-  int replies;
-  int posts;
+  int pts = 1;
+  int prestige = 100;
+  int money = 100;
+  int mScore = 100;
+  int popularity = 100;
+  int friends = 100;
+  int replies = 100;
+  int posts = 100;
 
   @override
   void initState() {
@@ -40,44 +39,6 @@ class _AccountTabState extends State<AccountTab> {
       if (doc.querySelector("#wp").innerHtml.contains('<a id="succeedmessage_href">如果你的浏览器没有自动跳转，请点击此链接</a>')) Routes.navigateTo(context, "/login");
       try {
         var pts = doc.querySelector("#psts li").text.substring(2).trim().toInt();
-        var max = pts.isIn(1, 49)
-            ? 50
-            : pts.isIn(50, 199)
-                ? 200
-                : pts.isIn(200, 499)
-                    ? 500
-                    : pts.isIn(500, 999)
-                        ? 1000
-                        : pts.isIn(1000, 2999)
-                            ? 3000
-                            : pts.isIn(3000, 4999)
-                                ? 5000
-                                : pts.isIn(5000, 9999)
-                                    ? 10000
-                                    : pts.isIn(10000, 19999)
-                                        ? 20000
-                                        : pts.isIn(20000, 49999)
-                                            ? 50000
-                                            : 0;
-        var min = pts.isIn(1, 49)
-            ? 0
-            : pts.isIn(50, 199)
-                ? 50
-                : pts.isIn(200, 499)
-                    ? 200
-                    : pts.isIn(500, 999)
-                        ? 500
-                        : pts.isIn(1000, 2999)
-                            ? 1000
-                            : pts.isIn(3000, 4999)
-                                ? 3000
-                                : pts.isIn(5000, 9999)
-                                    ? 5000
-                                    : pts.isIn(10000, 19999)
-                                        ? 10000
-                                        : pts.isIn(20000, 49999)
-                                            ? 20000
-                                            : 0;
         lv = doc.querySelector(".pbm span a").text;
         this.pts = pts;
         this.prestige = doc.querySelectorAll("#psts li")[1].nodes[1].text.trim().toInt();
@@ -120,7 +81,7 @@ class _AccountTabState extends State<AccountTab> {
               Padding(
                   padding: EdgeInsets.symmetric(vertical: 4),
                   child: Container(
-                      padding: EdgeInsets.all(2), decoration: BoxDecoration(border: Border.all(color: Colors.redAccent), borderRadius: BorderRadius.circular(4.0)), child: Text(lv, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold))))
+                      padding: EdgeInsets.all(2), decoration: BoxDecoration(border: Border.all(color: Colors.redAccent), borderRadius: BorderRadius.circular(4.0)), child: Text(lv, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))),
             ])
           ]),
           VEmptyView(24),

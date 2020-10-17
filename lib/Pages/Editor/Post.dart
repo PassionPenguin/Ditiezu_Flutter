@@ -1,7 +1,7 @@
 import 'dart:io';
 
+import 'package:Ditiezu/Widgets/w_iconMessage.dart';
 import 'package:cookie_jar/cookie_jar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
@@ -33,7 +33,7 @@ class Post extends StatefulWidget {
   _PostState createState() => _PostState();
 }
 
-class _PostState extends State<Post> {
+class _PostState extends State<Post> with TickerProviderStateMixin {
   TextEditingController controller = TextEditingController();
   TextEditingController subjectController = TextEditingController();
   Document oriDoc;
@@ -64,6 +64,12 @@ class _PostState extends State<Post> {
   String rewardsTimes = "";
   String rewardsMaxTimes = "";
   String rewardsOdds = "";
+
+  bool isLoading = true;
+  bool isMessageShowing = false;
+  String message = "";
+  IconData icon = Icons.check;
+  Color color = Colors.green;
 
   _queryParams() {
     switch (widget.mode) {
@@ -114,18 +120,44 @@ class _PostState extends State<Post> {
         break;
     }
 
+    setState(() {
+      isLoading = true;
+    });
     var str = await NetWork().post(url, formData);
+    setState(() {
+      isLoading = false;
+    });
     var response = str.substring(str.indexOf("', '", str.indexOf("handle")) + 4, str.indexOf("'", str.indexOf("', '", str.indexOf("handle")) + 4));
     if (str != "") {
       if (str.contains("succeed") || str.contains("success")) {
-        Toast(context, response);
-        Future.delayed(Duration(seconds: 2), () {
+        setState(() {
+          isMessageShowing = true;
+          message = response;
+          icon = Icons.check;
+          color = Colors.green;
+          Future.delayed(Duration(seconds: 2), () {
+            setState(() {
+              isMessageShowing = false;
+            });
+          });
+        });
+        Future.delayed(Duration(seconds: 3), () {
           Routes.pop(context);
         });
         if (widget.mode == "SIGHTML") Application.sp.setString("SIGHTML_VALUE", controller.text);
       } else if (str.contains('error')) {
         submitState = "TRUE";
-        Toast(context, response, accentColor: Colors.red, icon: Icons.close);
+        setState(() {
+          isMessageShowing = true;
+          message = response;
+          icon = Icons.close;
+          color = Colors.red;
+          Future.delayed(Duration(seconds: 2), () {
+            setState(() {
+              isMessageShowing = false;
+            });
+          });
+        });
       }
     }
   }
@@ -133,12 +165,26 @@ class _PostState extends State<Post> {
   _loadAttaches() async {
     attachUrlList = [];
     attachIDList = [];
+    setState(() {
+      isLoading = true;
+    });
     var doc = parseHtmlDocument(parseXmlDocument(await NetWork().get("http://www.ditiezu.com/forum.php?mod=ajax&action=imagelist&inajax=1&ajaxtarget=imgattachlist")).nodes[0].text);
     doc.querySelectorAll("[id^='imageattach']").forEach((e) {
       attachUrlList.add(e.querySelector("img").attributes["src"]);
       attachIDList.add(e.id.substring(11));
     });
-    setState(() {});
+    setState(() {
+      isMessageShowing = true;
+      isLoading = false;
+      message = "已成功获取附件列表";
+      icon = Icons.check;
+      color = Colors.green;
+      Future.delayed(Duration(seconds: 1), () {
+        setState(() {
+          isMessageShowing = false;
+        });
+      });
+    });
   }
 
   @override
@@ -161,9 +207,25 @@ class _PostState extends State<Post> {
           }).toList();
         }).toList();
       } catch (e) {}
+      setState(() {
+        isLoading = true;
+      });
       oriDoc = parseHtmlDocument(await NetWork().get("http://www.ditiezu.com/forum.php?mod=post&action=${_queryParams()}"));
+      setState(() {
+        isLoading = false;
+      });
       if (oriDoc.querySelector("#messagetext") != null) {
-        Toast(context, oriDoc.querySelector("#messagetext").text, accentColor: Colors.red, icon: Icons.close);
+        setState(() {
+          isMessageShowing = true;
+          message = oriDoc.querySelector("#messagetext").text;
+          icon = Icons.close;
+          color = Colors.red;
+          Future.delayed(Duration(seconds: 2), () {
+            setState(() {
+              isMessageShowing = false;
+            });
+          });
+        });
         if (oriDoc.querySelector("#messagelogin") != null) {
           Directory appDocDir = await getApplicationDocumentsDirectory();
           String appDocPath = appDocDir.path;
@@ -197,11 +259,29 @@ class _PostState extends State<Post> {
       return tmp > 240.0 ? 240.0 : tmp;
     }
 
-    return Scaffold(
-        body: SafeArea(
-            bottom: true,
-            child: Stack(children: [
-              Column(children: [
+    Map<String, Animation<double>> _fadeAnimation = {};
+    Map<String, AnimationController> _fadeController = {};
+    _fadeController["main"] = new AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _fadeController["loading"] = new AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _fadeController["messaging"] = new AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _fadeAnimation["main"] = new Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_fadeController["main"]);
+    _fadeAnimation["loading"] = new Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_fadeController["loading"]);
+    _fadeAnimation["messaging"] = new Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_fadeController["messaging"]);
+    var el = Stack(children: [
+      new Visibility(
+          visible: !isMessageShowing && !isLoading,
+          child: new FadeTransition(
+              opacity: _fadeAnimation["main"],
+              child: Column(children: [
                 AppBar(
                     backgroundColor: Colors.transparent,
                     elevation: 0,
@@ -217,7 +297,7 @@ class _PostState extends State<Post> {
                             Application.sp.setString("POST_${widget.mode}", controller.text).whenComplete(() => Toast(context, "已成功保存"));
                           },
                           child: Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.save, color: Colors.black))),
-                      CupertinoButton(
+                      MaterialButton(
                           onPressed: () {
                             if (submitState == "TRUE") _onSubmit();
                           },
@@ -243,7 +323,7 @@ class _PostState extends State<Post> {
                                 },
                               )),
                           Expanded(
-                              child: CupertinoTextField(
+                              child: TextField(
                             decoration: null,
                             controller: subjectController,
                           ))
@@ -252,9 +332,8 @@ class _PostState extends State<Post> {
                         child: Container(
                             color: Colors.white,
                             padding: EdgeInsets.all(16),
-                            child: CupertinoTextField(
+                            child: TextField(
                               onChanged: (str) {
-                                print(submitState);
                                 if (str.length >= 10 && submitState == "FALSE") submitState = "TRUE";
                               },
                               controller: controller,
@@ -350,8 +429,25 @@ class _PostState extends State<Post> {
                         ]))
                   ])
                 ]))
-              ])
-            ])));
+              ]))),
+      new Visibility(visible: isLoading, child: new FadeTransition(opacity: _fadeAnimation["loading"], child: Center(child: CircularProgressIndicator()))),
+      new Visibility(visible: isMessageShowing && !isLoading, child: new FadeTransition(opacity: _fadeAnimation["messaging"], child: Center(child: IconMessage(icon: icon, color: color, message: message))))
+    ]);
+    if (isLoading) {
+      _fadeController["main"].reverse();
+      _fadeController["messaging"].reverse();
+      _fadeController["loading"].forward();
+    } else if (isMessageShowing) {
+      _fadeController["main"].reverse();
+      _fadeController["messaging"].forward();
+      _fadeController["loading"].reverse();
+    } else {
+      _fadeController["main"].forward();
+      _fadeController["messaging"].reverse();
+      _fadeController["loading"].reverse();
+    }
+
+    return Scaffold(body: SafeArea(bottom: true, child: el));
   }
 
   _setText(before, value, after) {

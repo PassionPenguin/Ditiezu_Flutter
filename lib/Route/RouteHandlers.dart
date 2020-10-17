@@ -1,8 +1,8 @@
 import 'package:fluro/fluro.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
+import '../Pages/Editor/ImageUploader.dart';
 import '../Pages/Editor/Post.dart';
-import '../Pages/Editor/UploadImages.dart';
 import '../Pages/Home/AccountTab/License.dart';
 import '../Pages/Home/AccountTab/LoginPage.dart';
 import '../Pages/Home/AccountTab/OpenSource.dart';
@@ -44,7 +44,7 @@ var postHandler = new Handler(handlerFunc: (BuildContext context, Map<String, Li
 });
 
 var uploaderHandler = new Handler(handlerFunc: (BuildContext context, Map<String, List<Object>> params) {
-  return UploadImages(params["hash"].first.toString(), params["uid"].first.toString().toInt(), params["fid"].first.toString().toInt());
+  return ImageUploader(params["hash"].first.toString(), params["uid"].first.toString().toInt(), params["fid"].first.toString().toInt());
 });
 
 var licenseHandler = new Handler(handlerFunc: (BuildContext context, Map<String, List<Object>> params) {

@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 double width(BuildContext ctx) {
   return MediaQuery.of(ctx).size.width;

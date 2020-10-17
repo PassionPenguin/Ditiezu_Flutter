@@ -156,7 +156,10 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
                                     padding: EdgeInsets.all(7),
                                     child: GestureDetector(
                                         onTap: () {
-                                          Routes.navigateTo(context, "/post", params: {"mode": "REPLY", "tid": tid.toString(), "fid": fid.toString(), "pid": data.pid.toString()});
+                                          () async {
+                                            await Routes.navigateTo(context, "/post", params: {"mode": "REPLY", "tid": tid.toString(), "fid": fid.toString(), "pid": data.pid.toString()});
+                                            _contentResolver();
+                                          }();
                                         },
                                         child: Text("回复", style: TextStyle(color: Colors.grey[600])))),
                                 Visibility(

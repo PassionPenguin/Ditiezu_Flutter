@@ -145,7 +145,6 @@ class _NotificationTabState extends State<NotificationTab> with TickerProviderSt
     if (isLoading) {
       _fadeController["main"].reverse();
       _fadeController["messaging"].reverse();
-      Future.delayed(Duration(seconds: 1), () {});
       _fadeController["loading"].forward();
     } else if (isMessageShowing) {
       _fadeController["main"].reverse();

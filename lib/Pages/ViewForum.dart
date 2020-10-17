@@ -195,7 +195,10 @@ class _ViewForumState extends State<ViewForum> {
                       bottom: 24,
                       child: FloatingActionButton(
                           onPressed: () {
-                            Routes.navigateTo(context, "/post", params: {"mode": "NEW", "fid": fid.toString()});
+                            () async {
+                              await Routes.navigateTo(context, "/post", params: {"mode": "NEW", "fid": fid.toString()});
+                              _contentResolver();
+                            }();
                           },
                           child: Icon(Icons.add))),
                   DropdownMenu(maxMenuHeight: kDropdownMenuItemHeight * 10,
