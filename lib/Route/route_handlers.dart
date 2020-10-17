@@ -1,10 +1,11 @@
 // splash 页面
 import 'package:Ditiezu/pages/Editor/Post.dart';
 import 'package:Ditiezu/pages/Editor/UploadImages.dart';
+import 'package:Ditiezu/pages/Home/AccountTab/License.dart';
+import 'package:Ditiezu/pages/Home/AccountTab/LoginPage.dart';
+import 'package:Ditiezu/pages/Home/AccountTab/OpenSource.dart';
+import 'package:Ditiezu/pages/Home/AccountTab/Privacy.dart';
 import 'package:Ditiezu/pages/Home/home_page.dart';
-import 'package:Ditiezu/pages/License.dart';
-import 'package:Ditiezu/pages/LoginPage.dart';
-import 'package:Ditiezu/pages/OpenSource.dart';
 import 'package:Ditiezu/pages/ViewForum.dart';
 import 'package:Ditiezu/pages/ViewThread/ViewThread.dart';
 import 'package:Ditiezu/utils/exts.dart';
@@ -67,8 +68,12 @@ var licenseHandler = new Handler(
       return License();
 });
 
-
 var openSourceLicenseHandler = new Handler(
     handlerFunc: (BuildContext context, Map<String, List<Object>> params) {
       return OpenSourceLicense();
+});
+
+var privacyHandler = new Handler(
+    handlerFunc: (BuildContext context, Map<String, List<Object>> params) {
+      return Privacy();
 });

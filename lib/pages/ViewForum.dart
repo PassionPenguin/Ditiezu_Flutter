@@ -50,19 +50,7 @@ class _ViewForumState extends State<ViewForum> {
     'heat&orderby=heats',
     'typeid'
   ];
-  List<SelectItem> _filtersList = [
-    SelectItem("默认"),
-    SelectItem("精选"),
-    SelectItem("推介"),
-    SelectItem("投票"),
-    SelectItem("活动"),
-    SelectItem("发帖时间"),
-    SelectItem("回复"),
-    SelectItem("查看"),
-    SelectItem("最后回复"),
-    SelectItem("热度"),
-    SelectItem("分区")
-  ];
+  List<SelectItem> _filtersList = [SelectItem("默认"), SelectItem("精选"), SelectItem("推介"), SelectItem("投票"), SelectItem("活动"), SelectItem("发帖时间"), SelectItem("回复"), SelectItem("查看"), SelectItem("最后回复"), SelectItem("热度"), SelectItem("分区")];
   List<ThreadItem> forumList = [];
   GlobalKey globalKey = GlobalKey();
 
@@ -90,10 +78,7 @@ class _ViewForumState extends State<ViewForum> {
                           Routes.pop(context);
                         }),
                     title: Text(cur.categoryName, style: TextStyle(color: Colors.black)),
-                    actions: [
-                      Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.search, color: Colors.black)),
-                      Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.more_vert, color: Colors.black))
-                    ],
+                    actions: [Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.search, color: Colors.black)), Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.more_vert, color: Colors.black))],
                     flexibleSpace: Column()),
                 DropdownHeader(
                     onTap: (int index) {
@@ -167,19 +152,10 @@ class _ViewForumState extends State<ViewForum> {
                           var c = <InlineSpan>[];
                           c.add(TextSpan(text: data.badge, style: TextStyle(fontSize: 18.5, fontWeight: FontWeight.w400, color: Colors.lightBlue)));
                           c.add(TextSpan(text: data.threadTitle, style: TextStyle(fontSize: 18.5, fontWeight: FontWeight.w600, color: Colors.black87)));
-                          if (data.isNew)
-                            c.add(WidgetSpan(
-                                child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_new.png", height: 14))));
-                          if (data.isHot)
-                            c.add(WidgetSpan(
-                                child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_hot.png", height: 14))));
-                          if (data.withImage)
-                            c.add(WidgetSpan(
-                                child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_image.png", height: 14))));
-                          if (data.withAttachment)
-                            c.add(WidgetSpan(
-                                child:
-                                    Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_attachment.png", height: 14))));
+                          if (data.isNew) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_new.png", height: 14))));
+                          if (data.isHot) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_hot.png", height: 14))));
+                          if (data.withImage) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_image.png", height: 14))));
+                          if (data.withAttachment) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_attachment.png", height: 14))));
                           return TextSpan(children: c);
                         }();
                         return SafeArea(
@@ -201,11 +177,7 @@ class _ViewForumState extends State<ViewForum> {
                                           Text.rich(tp),
                                           Padding(padding: EdgeInsets.only(top: 8)),
                                           Text("${data.authorName} $dt", style: TextStyle(fontSize: 12)),
-                                          if (data.threadContent.trim().isNotEmpty)
-                                            Column(children: [
-                                              Padding(padding: EdgeInsets.only(top: 4)),
-                                              Text(data.threadContent, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400), maxLines: 3)
-                                            ]),
+                                          if (data.threadContent.trim().isNotEmpty) Column(children: [Padding(padding: EdgeInsets.only(top: 4)), Text(data.threadContent, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400), maxLines: 3)]),
                                           Padding(padding: EdgeInsets.only(top: 8)),
                                           Row(children: [
                                             Text(data.views.toString() + " 查看", style: TextStyle(color: Colors.black45)),
@@ -236,7 +208,10 @@ class _ViewForumState extends State<ViewForum> {
                                 itemBuilder: buildCheckItem,
                                 callback: (index) {
                                   typeID = true;
+                                  if (filter == "") filter = "typeid";
                                   selectedType = _typesList[index];
+                                  currentPage = 1;
+                                  _contentResolver();
                                   setState(() {});
                                 },
                               );
@@ -250,6 +225,8 @@ class _ViewForumState extends State<ViewForum> {
                                   itemBuilder: buildCheckItem,
                                   callback: (index) {
                                     filter = filtersParam[index];
+                                    currentPage = 1;
+                                    _contentResolver();
                                     setState(() {});
                                   });
                             },
@@ -277,10 +254,11 @@ class _ViewForumState extends State<ViewForum> {
     () async {
       var response = await NetWork().get("http://www.ditiezu.com/forum.php?mod=forumdisplay&fid=$fid&page=$currentPage" + queryParams());
       var document = parseHtmlDocument(response);
-      if (document.querySelector("#pgt .pg") != null) {
+      if (document.querySelector("#pgt .pg") != null)
         pages = int.parse(document.querySelector("#pgt .pg").querySelectorAll("*:not(.nxt)").last.text.replaceFirst("... ", ""));
-      }
-      List<ThreadItem> tmpList = [];
+      else
+        pages = 1;
+      forumList = [];
       document.querySelectorAll("#thread_types li:not(#ttp_all):not(.xw1) a").forEach((e) {
         var hrf = e.attributes["href"];
         hrf = hrf.substring(hrf.indexOf("typeid=") + 7);
@@ -298,7 +276,7 @@ class _ViewForumState extends State<ViewForum> {
         var targetId = title.attributes["href"].contains(".html")
             ? int.parse(title.attributes["href"].substring(30, title.attributes["href"].lastIndexOf(".html") - 4))
             : int.parse(title.attributes["href"].substring(52, title.attributes["href"].indexOf("&", 52)));
-        tmpList.add(ThreadItem(
+        forumList.add(ThreadItem(
             title.innerHtml,
             "",
             author.innerHtml,
@@ -314,7 +292,6 @@ class _ViewForumState extends State<ViewForum> {
             element.querySelector("[alt='attach_img']") != null,
             element.querySelector("[alt='attachment']") != null));
       });
-      forumList = tmpList;
       setState(() {});
       lw.onCancel();
     }();

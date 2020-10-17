@@ -3,10 +3,13 @@ import 'dart:io';
 import 'package:Ditiezu/Network/network.dart';
 import 'package:Ditiezu/Route/routes.dart';
 import 'package:Ditiezu/app.dart';
+import 'package:Ditiezu/model/user.dart';
+import 'package:Ditiezu/provider/user_model.dart';
 import 'package:Ditiezu/utils/exts.dart';
 import 'package:Ditiezu/widgets/v_empty_view.dart';
 import 'package:Ditiezu/widgets/w_confirm.dart';
 import 'package:Ditiezu/widgets/w_setting.dart';
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -104,13 +107,7 @@ class _AccountTabState extends State<AccountTab> {
           Row(children: [
             Padding(
                 padding: EdgeInsets.only(right: 16),
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(48),
-                    child: Image(
-                        image: NetworkImage("http://ditiezu.com/uc_server/avatar.php?mod=avatar&uid=${Application.user.uid}"),
-                        width: 96,
-                        height: 96,
-                        fit: BoxFit.cover))),
+                child: ClipRRect(borderRadius: BorderRadius.circular(48), child: Image(image: NetworkImage("http://ditiezu.com/uc_server/avatar.php?mod=avatar&uid=${Application.user.uid}"), width: 96, height: 96, fit: BoxFit.cover))),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Padding(
                   padding: EdgeInsets.only(bottom: 12),
@@ -122,24 +119,12 @@ class _AccountTabState extends State<AccountTab> {
               Padding(
                   padding: EdgeInsets.symmetric(vertical: 4),
                   child: Container(
-                      padding: EdgeInsets.all(2),
-                      decoration: BoxDecoration(border: Border.all(color: Colors.redAccent), borderRadius: BorderRadius.circular(4.0)),
-                      child: Text(lv, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold))))
+                      padding: EdgeInsets.all(2), decoration: BoxDecoration(border: Border.all(color: Colors.redAccent), borderRadius: BorderRadius.circular(4.0)), child: Text(lv, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold))))
             ])
           ]),
           VEmptyView(24),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            _stateDisplay("积分", pts.toString()),
-            _stateDisplay("威望", prestige.toString()),
-            _stateDisplay("金钱", money.toString()),
-            _stateDisplay("M值", mScore.toString())
-          ]),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            _stateDisplay("人气", popularity.toString()),
-            _stateDisplay("好友", friends.toString()),
-            _stateDisplay("回帖数", replies.toString()),
-            _stateDisplay("主题帖", posts.toString())
-          ]),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [_stateDisplay("积分", pts.toString()), _stateDisplay("威望", prestige.toString()), _stateDisplay("金钱", money.toString()), _stateDisplay("M值", mScore.toString())]),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [_stateDisplay("人气", popularity.toString()), _stateDisplay("好友", friends.toString()), _stateDisplay("回帖数", replies.toString()), _stateDisplay("主题帖", posts.toString())]),
           VEmptyView(24),
           Column(children: [
             Setting("清除缓存", "清除APP留下的所有的缓存数据", () {
@@ -151,26 +136,38 @@ class _AccountTabState extends State<AccountTab> {
               });
             }),
             Setting("版本数据", "当前版本 ${Application.CHANNEL} ${Application.VERSION_NAME}", () {}, type: Setting.TYPE_NOTING),
-            Setting("隐私政策", null, () {}),
+            Setting("隐私政策", null, () {
+              Routes.navigateTo(context, "/privacy");
+            }),
             Setting("用户协议", null, () {
               Routes.navigateTo(context, "/license");
             }),
             Setting("开源许可", null, () {
-              Routes.navigateTo(context, "/openSourceLicense");}),
+              Routes.navigateTo(context, "/openSourceLicense");
+            }),
             Setting("错误反馈", null, () {
               // OPEN SPECIFIC URL
             }, type: Setting.TYPE_CUSTOM_ICON, icon: Icon(Icons.bug_report)),
             InkWell(
-                onTap: () {},
-                child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), child: Center(child: Text("退出账号", style: TextStyle(color: Colors.red)))))
+                onTap: () {
+                  Confirm(context, "退出账号", "确认退出账号？", () {
+                    () async {
+                      Directory appDocDir = await getApplicationDocumentsDirectory();
+                      String appDocPath = appDocDir.path;
+                      var cookieJar = PersistCookieJar(dir: appDocPath + "/.cookies/");
+                      cookieJar.deleteAll();
+                      UserModel.saveUserInfo(User(uid: 0, userName: "", loginState: false));
+                      Routes.navigateTo(context, "/login", clearStack: true);
+                    }();
+                  });
+                },
+                child: Container(padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16), child: Center(child: Text("退出账号", style: TextStyle(color: Colors.red)))))
           ])
         ]));
     return Scaffold(body: SingleChildScrollView(child: page));
   }
 
   _stateDisplay(String name, String value) {
-    return Container(
-        width: 72, height: 48, padding: EdgeInsets.all(4), child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [Text(value), Text(name)]));
+    return Container(width: 72, height: 48, padding: EdgeInsets.all(4), child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [Text(value), Text(name)]));
   }
 }

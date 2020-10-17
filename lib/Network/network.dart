@@ -33,21 +33,17 @@ class NetWork {
     "Connection": "keep-alive"
   };
 
-  // {"Referer": "http://www.ditiezu.com/", "Origin": "http://www.ditiezu.com/", "Host": "www.ditiezu.com", "DNT": "1", "Proxy-Connection": "keep-alive"};
-
   Future<Dio> openConn() async {
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String appDocPath = appDocDir.path;
-    var cookieJar = PersistCookieJar(dir: appDocPath + "/.cookies/");
+    var cookieJar = PersistCookieJar(dir: (await getApplicationDocumentsDirectory()).path + "/.cookies/");
     dio.interceptors.add(CookieManager(cookieJar));
     (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (HttpClient client) {
       if (retrieveAsDesktopPage)
         client.userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537 (KHTML, like Gecko) Chrome/87 Safari/537";
       else
         client.userAgent = "Mozilla/5.0 (Linux; Android 6.0;) AppleWebKit/537 (KHTML, like Gecko) Chrome/87 Mobile Safari/537";
-      client.findProxy = (uri) {
-        return "PROXY 192.168.50.201:8888";
-      };
+//      client.findProxy = (uri) {
+//        return "PROXY 192.168.50.201:8888";
+//      };
       client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
     };
     return dio;

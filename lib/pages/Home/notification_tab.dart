@@ -2,11 +2,14 @@ import 'package:Ditiezu/Network/network.dart';
 import 'package:Ditiezu/Route/routes.dart';
 import 'package:Ditiezu/model/NotificationItem.dart';
 import 'package:Ditiezu/widgets/v_empty_view.dart';
+import 'package:Ditiezu/widgets/w_iconMessage.dart';
 import 'package:Ditiezu/widgets/w_loading.dart';
 import 'package:Ditiezu/widgets/w_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:universal_html/parsing.dart';
+
+import 'NotificationTab/NotificationListBuilder.dart';
 
 class NotificationTab extends StatefulWidget {
   NotificationTab(this.ctx);
@@ -17,30 +20,67 @@ class NotificationTab extends StatefulWidget {
   _NotificationTabState createState() => _NotificationTabState();
 }
 
-class _NotificationTabState extends State<NotificationTab> {
+class _NotificationTabState extends State<NotificationTab> with TickerProviderStateMixin {
   List<NotificationItem> notificationList = [];
   bool isRead = false;
-  LoadingWidget lw;
+
+  Map<String, Animation<double>> _fadeAnimation = {};
+  Map<String, AnimationController> _fadeController = {};
+  bool isLoading = true;
+  bool isMessageShowing = false;
+  String message = "";
+  IconData icon = Icons.check;
+  Color color = Colors.green;
+  Widget mainContainer;
+  Widget loadingWidget;
+  Widget messageWidget;
 
   @override
   void initState() {
-    super.initState();
+    _fadeController["main"] = new AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _fadeController["loading"] = new AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _fadeController["messaging"] = new AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _fadeAnimation["main"] = new Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_fadeController["main"]);
+    _fadeAnimation["loading"] = new Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_fadeController["loading"]);
+    _fadeAnimation["messaging"] = new Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_fadeController["messaging"]);
     Future.delayed(Duration(milliseconds: 0)).then((e) {
       () async {
         _contentRetriever();
       }();
     });
+    super.initState();
   }
 
   _contentRetriever() async {
-    lw = LoadingWidget(context);
+    setState(() {
+      isLoading = false;
+      isMessageShowing = false;
+    });
     notificationList = [];
+    setState(() {
+      isLoading = true;
+    });
     var response = await NetWork().get("http://www.ditiezu.com/home.php?mod=space&do=notice&isread=${isRead ? 1 : 0}");
+    setState(() {
+      isLoading = false;
+    });
     var doc = parseHtmlDocument(response);
     if (doc.querySelector(".emp") != null && doc.querySelector(".emp").text.contains("暂时没有新提醒")) {
-      lw.onCancel();
-      Toast(context, "暂时没有新提醒", icon: Icons.sync);
-      setState(() {});
+      setState(() {
+        isMessageShowing = true;
+        message = "暂时没有新提醒";
+        icon = Icons.check;
+        color = Colors.green;
+      });
       return;
     }
     var aBrackets = [];
@@ -59,9 +99,7 @@ class _NotificationTabState extends State<NotificationTab> {
         }
         var aBracket = it.querySelector(".ntc_body a:last-child");
         aBrackets.add(aBracket);
-        imageUrls.add(it.querySelector("img").attributes["src"].contains("systempm")
-            ? "http://www.ditiezu.com/" + it.querySelector("img").attributes["src"]
-            : it.querySelector("img").attributes["src"]);
+        imageUrls.add(it.querySelector("img").attributes["src"].contains("systempm") ? "http://www.ditiezu.com/" + it.querySelector("img").attributes["src"] : it.querySelector("img").attributes["src"]);
         values.add(it.querySelector(".ntc_body").text);
         descriptions.add(quote);
         times.add(it.querySelector("dt span").text);
@@ -71,6 +109,9 @@ class _NotificationTabState extends State<NotificationTab> {
       }
     });
     () async {
+      setState(() {
+        isLoading = false;
+      });
       for (int i = 0; i < aBrackets.length; i++) {
         var tid = "-1";
         var page = "1";
@@ -92,15 +133,33 @@ class _NotificationTabState extends State<NotificationTab> {
         tids.add(tid);
         pages.add(page);
       }
-      for (int i = 0; i < aBrackets.length; i++)
-        notificationList
-            .add(NotificationItem(imageUrl: imageUrls[i], value: values[i], description: descriptions[i], time: times[i], tid: tids[i], page: pages[i]));
-      setState(() {});
-      lw.onCancel();
+      for (int i = 0; i < aBrackets.length; i++) notificationList.add(NotificationItem(imageUrl: imageUrls[i], value: values[i], description: descriptions[i], time: times[i], tid: tids[i], page: pages[i]));
+      setState(() {
+        isLoading = false;
+      });
     }();
   }
 
   Widget _contentResolver(BuildContext context) {
+    var el = Stack(children: [
+      new Visibility(visible: !isMessageShowing && !isLoading, child: new FadeTransition(opacity: _fadeAnimation["main"], child: NotificationList(notificationList: notificationList))),
+      new Visibility(visible: isLoading, child: new FadeTransition(opacity: _fadeAnimation["loading"], child: Center(child: CircularProgressIndicator()))),
+      new Visibility(visible: isMessageShowing && !isLoading, child: new FadeTransition(opacity: _fadeAnimation["messaging"], child: Center(child: IconMessage(icon: icon, color: color, message: message))))
+    ]);
+    if (isLoading) {
+      _fadeController["main"].reverse();
+      _fadeController["messaging"].reverse();
+      Future.delayed(Duration(seconds: 1), () {});
+      _fadeController["loading"].forward();
+    } else if (isMessageShowing) {
+      _fadeController["main"].reverse();
+      _fadeController["messaging"].forward();
+      _fadeController["loading"].reverse();
+    } else {
+      _fadeController["main"].forward();
+      _fadeController["messaging"].reverse();
+      _fadeController["loading"].reverse();
+    }
     return SafeArea(
         top: true,
         child: Row(children: [
@@ -112,10 +171,7 @@ class _NotificationTabState extends State<NotificationTab> {
                     _contentRetriever();
                   }
                 },
-                child: Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.only(top: 12, bottom: 4, left: 12, right: 12),
-                    child: Text("未\n读", style: TextStyle(fontSize: 16, color: isRead ? Colors.black : Colors.lightBlue[600])))),
+                child: Container(color: Colors.white, padding: EdgeInsets.only(top: 12, bottom: 4, left: 12, right: 12), child: Text("未\n读", style: TextStyle(fontSize: 16, color: isRead ? Colors.black : Colors.lightBlue[600])))),
             GestureDetector(
                 onTap: () {
                   if (!isRead) {
@@ -125,58 +181,14 @@ class _NotificationTabState extends State<NotificationTab> {
                 },
                 child: ClipRRect(
                     borderRadius: BorderRadius.only(bottomRight: Radius.circular(12)),
-                    child: Container(
-                        color: Colors.white,
-                        padding: EdgeInsets.only(top: 4, bottom: 12, left: 12, right: 12),
-                        child: Text("已\n读", style: TextStyle(fontSize: 16, color: !isRead ? Colors.black : Colors.lightBlue[600]))))),
+                    child: Container(color: Colors.white, padding: EdgeInsets.only(top: 4, bottom: 12, left: 12, right: 12), child: Text("已\n读", style: TextStyle(fontSize: 16, color: !isRead ? Colors.black : Colors.lightBlue[600]))))),
           ]),
-          Expanded(
-              child: ListView.builder(
-                  itemBuilder: (BuildContext buildContext, int index) {
-                    var data = notificationList[index];
-                    return SafeArea(
-                        top: false,
-                        bottom: false,
-                        child: InkWell(
-                            onTap: () {
-                              Routes.navigateTo(context, Routes.thread, params: {'tid': data.tid.toString(), "page": data.page.toString()});
-                            },
-                            child: Padding(
-                                padding: const EdgeInsets.only(top: 24.0, bottom: 8.0, right: 24.0, left: 24.0),
-                                child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                                  Container(
-                                      width: 40,
-                                      height: 40,
-                                      child: ClipRRect(
-                                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                                          child: FadeInImage.assetNetwork(
-                                            placeholder: 'assets/images/noavatar_middle.png',
-                                            imageErrorBuilder: (BuildContext context, Object error, StackTrace stackTrace) {
-                                              return Image.asset("assets/images/noavatar_middle.png");
-                                            },
-                                            image: data.imageUrl,
-                                          ))),
-                                  Expanded(
-                                      child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                          padding: EdgeInsets.only(left: 8),
-                                          child: Text(data.value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600))),
-                                      data.description != null
-                                          ? Padding(padding: EdgeInsets.only(top: 4, left: 8), child: Text(data.description))
-                                          : VEmptyView(0),
-                                      Padding(padding: EdgeInsets.only(top: 4, left: 8), child: Text(data.time, style: TextStyle(fontSize: 12))),
-                                    ],
-                                  )),
-                                ]))));
-                  },
-                  itemCount: notificationList.length))
+          Expanded(child: el)
         ]));
   }
 
   @override
   Widget build(context) {
-    return CupertinoPageScaffold(child: _contentResolver(context));
+    return Scaffold(body: _contentResolver(context));
   }
 }

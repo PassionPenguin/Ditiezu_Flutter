@@ -1,5 +1,5 @@
 import 'package:Ditiezu/app.dart';
-import 'package:Ditiezu/pages/Home/account_tab.dart';
+import 'package:Ditiezu/pages/Home/AccountTab/account_tab.dart';
 import 'package:Ditiezu/pages/Home/category_tab.dart';
 import 'package:Ditiezu/pages/Home/discovery_tab.dart';
 import 'package:Ditiezu/pages/Home/notification_tab.dart';
@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         child: Column(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth >= 400 ? (screenWidth - 400) / 2 : 0),
+              padding: EdgeInsets.symmetric(horizontal: screenWidth >= 768 ? (screenWidth - 768) / 2 : 0),
               child: TabBar(
                   onTap: (index) {
                     _isOnTab = true;
@@ -76,8 +76,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     Tab(
                       child: ClipRRect(
                           borderRadius: BorderRadius.circular(12.0),
-                          child: FadeInImage.assetNetwork(
-                              width: 24, height: 24, placeholder: "assets/images/noavatar_middle.png", image: "http://ditiezu.com/uc_server/avatar.php?mod=avatar&uid=${Application.user.uid}")),
+                          child: FadeInImage.assetNetwork(width: 24, height: 24, placeholder: "assets/images/noavatar_middle.png", image: "http://ditiezu.com/uc_server/avatar.php?mod=avatar&uid=${Application.user.uid}")),
                     ),
                     Tab(
                       child: Text("发现", style: _selectIndex == 1 ? _selectStyle : _defaultStyle),

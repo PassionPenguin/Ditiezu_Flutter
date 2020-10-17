@@ -13,6 +13,7 @@ class Routes {
   static String uploader = "/uploader";
   static String license = "/license";
   static String openSourceLicense = "/openSourceLicense";
+  static String privacy = "/privacy";
 
   // 配置route
   static void configureRoutes(Router router) {
@@ -30,6 +31,7 @@ class Routes {
     router.define(uploader, handler: uploaderHandler);
     router.define(license, handler: licenseHandler);
     router.define(openSourceLicense, handler: openSourceLicenseHandler);
+    router.define(privacy, handler: privacyHandler);
   }
 
   static Future navigateTo(BuildContext context, String path,
