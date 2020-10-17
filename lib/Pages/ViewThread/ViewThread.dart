@@ -168,7 +168,10 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
                                         padding: EdgeInsets.all(7),
                                         child: GestureDetector(
                                             onTap: () {
-                                              _requestScore(data.pid);
+                                              () async {
+                                                await _requestScore(data.pid);
+                                                _contentResolver();
+                                              }();
                                             },
                                             child: Text("评分", style: TextStyle(color: Colors.grey[600]))))),
                               ])
@@ -263,34 +266,32 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
     }
   }
 
-  _requestScore(int pid) {
-    () async {
-      Animation<double> _fadeAnimation;
-      AnimationController _fadeController;
-      _fadeController = new AnimationController(vsync: this, duration: Duration(seconds: 1));
-      _fadeAnimation = new Tween(
-        begin: 0.0,
-        end: 1.0,
-      ).animate(_fadeController);
-      FToast ft = FToast()..init(context);
-      var el = new FadeTransition(
-          opacity: _fadeAnimation,
-          child: new BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-              child: RateWindow(
-                  onFinish: () {
-                    ft.remove();
-                  },
-                  tid: tid,
-                  pid: pid,
-                  formhash: formhash)));
-      ft.showToast(
-          child: el,
-          positionedToastBuilder: (BuildContext context, Widget child) {
-            return Positioned(bottom: 0, left: 0, right: 0, child: child);
-          });
-      _fadeController.forward();
-    }();
+  _requestScore(int pid) async {
+    Animation<double> _fadeAnimation;
+    AnimationController _fadeController;
+    _fadeController = new AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _fadeAnimation = new Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_fadeController);
+    FToast ft = FToast()..init(context);
+    var el = new FadeTransition(
+        opacity: _fadeAnimation,
+        child: new BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+            child: RateWindow(
+                onFinish: () {
+                  ft.remove();
+                },
+                tid: tid,
+                pid: pid,
+                formhash: formhash)));
+    ft.showToast(
+        child: el,
+        positionedToastBuilder: (BuildContext context, Widget child) {
+          return Positioned(bottom: 0, left: 0, right: 0, child: child);
+        });
+    _fadeController.forward();
   }
 
   @override
