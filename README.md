@@ -8,7 +8,7 @@ Check the latest Release Packages at [gh-Release](https://github.com/PassionPeng
 
 iOS Alternative Link (Direct) [Ditiezu.ipa](https://passionpenguin.coding.net/api/share/download/2b799220-cc44-41ca-9381-960ccc1dcfde)
 
-Android Alternative Link (Direct) [Ditiezu.ipa](https://passionpenguin.coding.net/api/share/download/3f5481e8-b39a-4266-8fa7-71dfc2902faa)
+Android Alternative Link (Direct) [app-release.apk](https://passionpenguin.coding.net/api/share/download/3f5481e8-b39a-4266-8fa7-71dfc2902faa)
 
 ## License
 
