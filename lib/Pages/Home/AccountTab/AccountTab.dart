@@ -107,9 +107,6 @@ class _AccountTabState extends State<AccountTab> {
             Setting("开源许可", null, () {
               Routes.navigateTo(context, "/openSourceLicense");
             }),
-            Setting("错误反馈", null, () {
-              // OPEN SPECIFIC URL
-            }, type: Setting.TYPE_CUSTOM_ICON, icon: Icon(Icons.bug_report)),
             InkWell(
                 onTap: () {
                   Confirm(context, "退出账号", "确认退出账号？", () {
