@@ -266,7 +266,7 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
     }
   }
 
-  _requestScore(int pid) async {
+  _requestScore(int pid) {
     Animation<double> _fadeAnimation;
     AnimationController _fadeController;
     _fadeController = new AnimationController(vsync: this, duration: Duration(seconds: 1));
@@ -282,6 +282,7 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
             child: RateWindow(
                 onFinish: () {
                   ft.remove();
+                  _contentResolver();
                 },
                 tid: tid,
                 pid: pid,
