@@ -7,9 +7,6 @@ PODS:
   - Flutter (1.0.0)
   - flutter_native_image (0.0.1):
     - Flutter
-  - fluttertoast (0.0.2):
-    - Flutter
-    - Toast
   - image_picker (4.7.14):
     - BSImagePicker (~> 2.10.3)
     - Flutter
@@ -23,12 +20,10 @@ PODS:
   - Reachability (3.2)
   - shared_preferences (0.0.1):
     - Flutter
-  - Toast (4.0.0)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_native_image (from `.symlinks/plugins/flutter_native_image/ios`)
-  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - keyboard_visibility (from `.symlinks/plugins/keyboard_visibility/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
@@ -41,15 +36,12 @@ SPEC REPOS:
     - BSImagePicker
     - BSImageView
     - Reachability
-    - Toast
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
   flutter_native_image:
     :path: ".symlinks/plugins/flutter_native_image/ios"
-  fluttertoast:
-    :path: ".symlinks/plugins/fluttertoast/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
   keyboard_visibility:
@@ -67,14 +59,12 @@ SPEC CHECKSUMS:
   BSImageView: a149459433a2687157d034c78e059d30ac7f2544
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_native_image: 9c0b7451838484458e5b0fae007b86a4c2d4bdfe
-  fluttertoast: 6122fa75143e992b1d3470f61000f591a798cc58
   image_picker: cf26c33b8032c6f1feae3b08b4a3c1d2298bda9f
   keyboard_visibility: 96a24de806fe6823c3ad956c01ba2ec6d056616f
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   permission_handler: 8278954f2382902f63f00dd8828769c0bd6d511b
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
-  Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
 
 PODFILE CHECKSUM: a75497545d4391e2d394c3668e20cfb1c2bbd4aa
 
