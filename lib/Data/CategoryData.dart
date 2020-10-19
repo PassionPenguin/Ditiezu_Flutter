@@ -53,6 +53,6 @@ var categoryList = [
   CategoryItem("站前广场", "闲谈杂侃版块，严禁灌水。", "assets/images/categoryIcons/message.svg", 21),
   CategoryItem("城际铁路", "城际高速铁路路线、特色车站、国内外交通枢纽及转乘车站、城际铁路选线、城际铁路列车站。", "assets/images/categoryIcons/high_speed_railway.svg", 46),
   CategoryItem("轨道知识", "地铁和轨道交通相关技术、知识发表讨论区。", "assets/images/categoryIcons/book.svg", 43),
-  CategoryItem("意见建议", "意见建议、反馈中心", "assets/images/categoryIcons/feedback.svg", 48),
+  CategoryItem("意见建议", "意见建议、反馈中心", "assets/images/categoryIcons/feedback.svg", 18),
   CategoryItem("站务公告", "站务公告中心", "assets/images/categoryIcons/announcement.svg", 17)
 ];
