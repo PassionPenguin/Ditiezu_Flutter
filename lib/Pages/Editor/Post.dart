@@ -13,7 +13,6 @@ import '../../Data/EmoticonsData.dart';
 import '../../Network/Network.dart';
 import '../../Network/NetworkImage.dart' as NetI;
 import "../../Route/Routes.dart";
-import '../../Widgets/w_toast.dart';
 import '../../app.dart';
 
 class Post extends StatefulWidget {
@@ -130,6 +129,7 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
     var response = str.substring(str.indexOf("', '", str.indexOf("handle")) + 4, str.indexOf("'", str.indexOf("', '", str.indexOf("handle")) + 4));
     if (str != "") {
       if (str.contains("succeed") || str.contains("success")) {
+        Application.sp.setString("POST_${widget.mode}", "");
         setState(() {
           isMessageShowing = true;
           message = response;
@@ -248,6 +248,8 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
       }
       await _loadAttaches();
       setState(() {});
+      var savedValue = Application.sp.getString("POST_${widget.mode}");
+      if (savedValue != null) controller.text = savedValue;
     }();
     super.initState();
   }
@@ -294,12 +296,52 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
                     actions: [
                       GestureDetector(
                           onTap: () {
-                            Application.sp.setString("POST_${widget.mode}", controller.text).whenComplete(() => Toast(context, "已成功保存"));
+                            Application.sp.setString("POST_${widget.mode}", controller.text)
+                              ..then((value) => {
+                                    setState(() {
+                                      isMessageShowing = true;
+                                      message = "已保存";
+                                      icon = Icons.save;
+                                      color = Colors.green;
+                                      Future.delayed(Duration(seconds: 1), () {
+                                        setState(() {
+                                          isMessageShowing = false;
+                                        });
+                                      });
+                                    })
+                                  })
+                              ..catchError((error) {
+                                setState(() {
+                                  isMessageShowing = true;
+                                  isLoading = false;
+                                  message = error;
+                                  icon = Icons.bug_report;
+                                  color = Colors.red;
+                                  Future.delayed(Duration(seconds: 1), () {
+                                    setState(() {
+                                      isMessageShowing = false;
+                                    });
+                                  });
+                                });
+                              });
                           },
                           child: Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.save, color: Colors.black))),
                       MaterialButton(
                           onPressed: () {
-                            if (submitState == "TRUE") _onSubmit();
+                            if (submitState == "TRUE")
+                              _onSubmit();
+                            else
+                              setState(() {
+                                isMessageShowing = true;
+                                message = "紫薯布丁红薯布丁～";
+                                icon = Icons.edit;
+                                color = Colors.red;
+                                Future.delayed(Duration(seconds: 1), () {
+                                  setState(() {
+                                    isMessageShowing = false;
+                                  });
+                                });
+                              });
                           },
                           child: Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.send, color: Colors.black)))
                     ]),
