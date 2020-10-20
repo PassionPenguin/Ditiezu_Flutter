@@ -76,6 +76,8 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
         return "newthread&fid=${widget.fid}";
       case "REPLY":
         return "reply&tid=${widget.tid}&fid=${widget.fid}&repquote=${widget.pid}";
+      case "EDIT":
+        return "edit&tid=${widget.tid}&pid=${widget.pid}";
       default:
         return "edit&pid=${widget.pid}";
     }
@@ -245,6 +247,10 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
             typeValueList.add(it.attributes["value"]);
           });
           currentTypeValue = typeValueList[0];
+          break;
+        case "EDIT":
+          controller.text = oriDoc.querySelector("textarea").innerHtml;
+          break;
       }
       await _loadAttaches();
       setState(() {});

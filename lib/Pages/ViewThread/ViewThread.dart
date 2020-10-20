@@ -169,11 +169,23 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
                                         child: GestureDetector(
                                             onTap: () {
                                               () async {
-                                                await _requestScore(data.pid);
+                                                _requestScore(data.pid);
                                                 _contentResolver();
                                               }();
                                             },
                                             child: Text("评分", style: TextStyle(color: Colors.grey[600]))))),
+                                Visibility(
+                                    visible: data.editable,
+                                    child: Padding(
+                                        padding: EdgeInsets.all(7),
+                                        child: GestureDetector(
+                                            onTap: () {
+                                              () async {
+                                                await Routes.navigateTo(context, "/post", params: {"mode": "EDIT", "tid": tid.toString(), "fid": fid.toString(), "pid": data.pid.toString()});
+                                                _contentResolver();
+                                              }();
+                                            },
+                                            child: Text("编辑", style: TextStyle(color: Colors.grey[600]))))),
                               ])
                             ]))
                       ]));
@@ -185,7 +197,7 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
     lw = LoadingWidget(context);
     try {
       () async {
-        List<PostItem> tmpList = [];
+        posts = [];
         var response = await NetWork().get("http://www.ditiezu.com/forum.php?mod=viewthread&tid=$tid&page=$currentPage");
         var doc = parseHtmlDocument(response);
         if (doc.querySelector("#messagetext") != null) {
@@ -240,11 +252,11 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
         title = doc.querySelector("#thread_subject").text;
         doc.querySelectorAll("table[id^='pid']").forEach((e) {
           if (e.querySelector(".avatar").text == "头像被屏蔽") {
-            tmpList.add(PostItem("", e.querySelector(".authi .xw1").innerText, -1, "第" + ((currentPage - 1) * 15 + index + 1).toString() + "楼 - " + e.querySelector("[id^='authorposton']").innerText.substring(4), int.parse(e.id.substring(3))));
+            posts.add(PostItem("", e.querySelector(".authi .xw1").innerText, -1, "第" + ((currentPage - 1) * 15 + index + 1).toString() + "楼 - " + e.querySelector("[id^='authorposton']").innerText.substring(4), int.parse(e.id.substring(3)), false));
             return;
           }
           var src = e.querySelector(".avatar a").attributes["href"];
-          tmpList.add(PostItem(
+          posts.add(PostItem(
               e.querySelector(".pcb").querySelector("[id^='postmessage']").innerHtml +
                   (e.querySelector(".pcb").querySelector(".pattl") != null ? e.querySelector(".pcb").querySelector(".pattl").innerHtml : "") +
                   (e.querySelector(".locked") != null ? "<div class='locked'>抱歉，您需要登录才可以查看或下载附件</div>" : "") +
@@ -252,12 +264,11 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
               e.querySelector(".authi .xw1").innerText,
               int.parse(((src.indexOf("uid-") + 4 <= 0 || src.indexOf(".html") <= 0) ? 0 : src.substring(src.indexOf("uid-") + 4, src.indexOf(".html")))),
               "第" + ((currentPage - 1) * 15 + index + 1).toString() + "楼 - " + e.querySelector("[id^='authorposton']").innerText.substring(4),
-              int.parse(e.id.substring(3))));
+              int.parse(e.id.substring(3)),
+              e.querySelector(".editp") != null));
           index++;
         });
         if (doc.querySelector("#pgt .pg") != null) pages = int.parse(doc.querySelector("#pgt .pg").querySelectorAll("*:not(.nxt)").last.text.replaceFirst("... ", ""));
-
-        posts = tmpList;
         setState(() {});
         lw.onCancel();
       }();

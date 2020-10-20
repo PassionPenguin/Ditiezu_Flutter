@@ -1,9 +1,10 @@
 class PostItem<T> {
-  PostItem(this.content, this.authorName, this.authorUID, this.postTime, this.pid);
+  PostItem(this.content, this.authorName, this.authorUID, this.postTime, this.pid, this.editable);
 
-  String content;
-  String authorName;
-  int authorUID;
-  String postTime;
-  int pid;
+  final String content;
+  final String authorName;
+  final int authorUID;
+  final String postTime;
+  final int pid;
+  final bool editable;
 }
