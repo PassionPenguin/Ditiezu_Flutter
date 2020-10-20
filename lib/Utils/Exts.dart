@@ -67,6 +67,10 @@ extension Str on String {
     }
     return double.parse(this, (e) => null) != null;
   }
+
+  int isNumericOrNum(int def) {
+    return this.isNumeric() ? int.parse(this) : def;
+  }
 }
 
 extension HexColor on Color {

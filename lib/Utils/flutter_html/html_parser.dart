@@ -1,12 +1,15 @@
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:Ditiezu/Route/Routes.dart';
 import 'package:csslib/parser.dart' as cssparser;
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as htmlparser;
+import 'package:url_launcher/url_launcher.dart';
 
+import '../Exts.dart';
 import 'flutter_html.dart';
 import 'src/html_elements.dart';
 import 'src/layout_element.dart';
@@ -23,7 +26,6 @@ typedef CustomRender = Widget Function(
 
 class HtmlParser extends StatelessWidget {
   final String htmlData;
-  final OnTap onLinkTap;
   final OnTap onImageTap;
   final ImageErrorListener onImageError;
   final bool shrinkWrap;
@@ -33,12 +35,17 @@ class HtmlParser extends StatelessWidget {
   final List<String> blacklistedElements;
   final String cookie;
 
-  HtmlParser({@required this.htmlData, this.onLinkTap, this.onImageTap, this.onImageError, this.shrinkWrap, this.style, this.customRender, this.blacklistedElements, this.cookie});
+  HtmlParser({@required this.htmlData, this.onImageTap, this.onImageError, this.shrinkWrap, this.style, this.customRender, this.blacklistedElements, this.cookie});
 
   @override
   Widget build(BuildContext context) {
     dom.Document document = parseHTML(htmlData);
-    StyledElement lexedTree = lexDomTree(document, customRender?.keys?.toList() ?? [], blacklistedElements, cookie);
+    StyledElement lexedTree = lexDomTree(
+      document,
+      customRender?.keys?.toList() ?? [],
+      blacklistedElements,
+      cookie,
+    );
     StyledElement styledTree = applyCSS(lexedTree);
     StyledElement inlineStyledTree = applyInlineStyles(styledTree);
     StyledElement customStyledTree = _applyCustomStyles(inlineStyledTree);
@@ -277,7 +284,44 @@ class HtmlParser extends StatelessWidget {
             MultipleTapGestureRecognizer: GestureRecognizerFactoryWithHandlers<MultipleTapGestureRecognizer>(
               () => MultipleTapGestureRecognizer(),
               (instance) {
-                instance..onTap = () => onLinkTap?.call(tree.href);
+                instance
+                  ..onTap = () {
+                    var href = tree.href;
+                    var uri = Uri.parse(href);
+                    if (uri.host == "ditiezu.com" || uri.host == "www.ditiezu.com") {
+                      // try to parse the content;
+                      var params = uri.queryParametersAll;
+                      if (uri.path == "/forum.php") {
+                        if (params["mod"].toString() == "viewthread") {
+                          var tid = params["tid"].toString().isNumericOrNum(-1).toString();
+                          var page = params["page"].toString().isNumericOrNum(1).toString();
+                          if (tid.toInt() != -1) Routes.navigateTo(context.buildContext, Routes.thread, params: {"page": page, "tid": tid});
+                        }
+                        if (params["mod"].toString() == "forumdisplay") {
+                          var fid = params["fid"].toString().isNumericOrNum(-1).toString();
+                          var page = params["page"].toString().isNumericOrNum(1).toString();
+                          if (fid.toInt() != -1) Routes.navigateTo(context.buildContext, Routes.forum, params: {"page": page, "fid": fid});
+                        }
+                      } else {
+                        // PARSE FOR THREAD
+                        var threadRegExp = RegExp("\/thread-(\\d*)-(\\d*)-(\\d*).html");
+                        var forumRegExp = RegExp("\/forum-(\\d*)-(\\d*)-(\\d*).html");
+                        if (threadRegExp.hasMatch(uri.path)) {
+                          var tid = threadRegExp.firstMatch(uri.path).group(1).toString().isNumericOrNum(-1).toString();
+                          var page = threadRegExp.firstMatch(uri.path).group(2).toString().toString().isNumericOrNum(1).toString();
+                          if (tid.toInt() != -1) Routes.navigateTo(context.buildContext, Routes.thread, params: {"page": page, "tid": tid});
+                        } else if (forumRegExp.hasMatch(uri.path)) {
+                          var fid = forumRegExp.firstMatch(uri.path).group(1).toString().isNumericOrNum(-1).toString();
+                          var page = forumRegExp.firstMatch(uri.path).group(2).toString().toString().isNumericOrNum(1).toString();
+                          if (fid.toInt() != -1) Routes.navigateTo(context.buildContext, Routes.forum, params: {"page": page, "fid": fid});
+                        }
+                      }
+                    } else {
+                      () async {
+                        if (await canLaunch(href)) await launch(href);
+                      }();
+                    }
+                  };
               },
             ),
           },

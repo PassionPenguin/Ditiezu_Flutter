@@ -31,22 +31,10 @@ class Html extends StatelessWidget {
   ///
   /// **style** Pass in the style information for the Html here.
   /// See [its wiki page](https://github.com/Sub6Resources/flutter_html/wiki/Style) for more info.
-  Html({
-    Key key,
-    @required this.data,
-    this.onLinkTap,
-    this.customRender,
-    this.onImageError,
-    this.shrinkWrap = false,
-    this.onImageTap,
-    this.blacklistedElements = const [],
-    this.style,
-    this.cookie
-  }) : super(key: key);
+  Html({Key key, @required this.data, this.customRender, this.onImageError, this.shrinkWrap = false, this.onImageTap, this.blacklistedElements = const [], this.style, this.cookie}) : super(key: key);
 
   final String cookie;
   final String data;
-  final OnTap onLinkTap;
   final ImageErrorListener onImageError;
   final bool shrinkWrap;
 
@@ -68,17 +56,8 @@ class Html extends StatelessWidget {
 
     return Container(
       width: width,
-      child: HtmlParser(
-        htmlData: data,
-        onLinkTap: onLinkTap,
-        onImageTap: onImageTap,
-        onImageError: onImageError,
-        shrinkWrap: shrinkWrap,
-        style: style,
-        customRender: customRender,
-        blacklistedElements: blacklistedElements,
-        cookie: cookie // API for the future
-      ),
+      child: HtmlParser(htmlData: data, onImageTap: onImageTap, onImageError: onImageError, shrinkWrap: shrinkWrap, style: style, customRender: customRender, blacklistedElements: blacklistedElements, cookie: cookie // API for the future
+          ),
     );
   }
 }
