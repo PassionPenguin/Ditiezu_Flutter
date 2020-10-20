@@ -28,6 +28,8 @@ class Post extends StatefulWidget {
 
   Post.edit({this.pid, this.tid, this.fid, this.mode = "EDIT"});
 
+  Post.signature({this.pid, this.tid, this.fid, this.mode = "SIGHTML"});
+
   @override
   _PostState createState() => _PostState();
 }
@@ -116,6 +118,10 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
         formData += "&noticetrimstr=" + UrlEncode().encode(oriDoc.querySelector("[name='noticetrimstr']").attributes['value']);
         formData += "&noticeauthormsg=" + UrlEncode().encode(oriDoc.querySelector("[name='noticeauthormsg']").attributes['value']);
         break;
+      case "SIGHTML":
+        url = "http://www.ditiezu.com/home.php?mod=spacecp&ac=profile";
+        formData += "&profilesubmit=true&sightml=${UrlEncode().encode(controller.text)}";
+        break;
       default:
         url = "http://www.ditiezu.com/home.php?mod=spacecp&ac=profile";
         break;
@@ -128,6 +134,36 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
     setState(() {
       isLoading = false;
     });
+    if (widget.mode == "SIGHTML" && str == '''<script type="text/javascript">parent.show_success('');</script>''') {
+      Application.sp.setString("SIGHTML", controller.text);
+      setState(() {
+        isMessageShowing = true;
+        message = "成功编辑保存";
+        icon = Icons.check;
+        color = Colors.green;
+        Future.delayed(Duration(seconds: 2), () {
+          setState(() {
+            isMessageShowing = false;
+          });
+        });
+      });
+      Future.delayed(Duration(seconds: 3), () {
+        Routes.pop(context);
+      });
+    } else {
+      submitState = "TRUE";
+      setState(() {
+        isMessageShowing = true;
+        message = "保存失败";
+        icon = Icons.close;
+        color = Colors.red;
+        Future.delayed(Duration(seconds: 2), () {
+          setState(() {
+            isMessageShowing = false;
+          });
+        });
+      });
+    }
     var response = str.substring(str.indexOf("', '", str.indexOf("handle")) + 4, str.indexOf("'", str.indexOf("', '", str.indexOf("handle")) + 4));
     if (str != "") {
       if (str.contains("succeed") || str.contains("success")) {
@@ -209,6 +245,14 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
           }).toList();
         }).toList();
       } catch (e) {}
+      if (widget.mode == "SIGHTML") {
+        formHash = parseHtmlDocument(await NetWork().get("http://www.ditiezu.com/search.php?mod=forum")).querySelector("[name=\"formhash\"]").attributes["value"];
+        controller.text = Application.sp.getString("SIGHTML") ?? "";
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
       setState(() {
         isLoading = true;
       });
@@ -298,7 +342,7 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
                         onTap: () {
                           Routes.pop(context);
                         }),
-                    title: Text(["发帖", "回复", "编辑"][["NEW", "REPLY", "EDIT"].indexOf(widget.mode)], style: TextStyle(color: Colors.black)),
+                    title: Text(["发帖", "回复", "编辑", "编辑个性签名"][["NEW", "REPLY", "EDIT", "SIGHTML"].indexOf(widget.mode)], style: TextStyle(color: Colors.black)),
                     actions: [
                       GestureDetector(
                           onTap: () {
@@ -411,18 +455,20 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
                               FocusScope.of(context).unfocus();
                               if (imageStage) imageStage = false;
                             }),
-                            _formatButton(Icon(Icons.insert_photo), () {
-                              if (imageStage && !keyboardState)
-                                imageStage = false;
-                              else
-                                imageStage = true;
-                              FocusScope.of(context).unfocus();
-                              if (emoticonStage) emoticonStage = false;
-                            }),
+                            Visibility(
+                                visible: widget.mode != "SIGHTML",
+                                child: _formatButton(Icon(Icons.insert_photo), () {
+                                  if (imageStage && !keyboardState)
+                                    imageStage = false;
+                                  else
+                                    imageStage = true;
+                                  FocusScope.of(context).unfocus();
+                                  if (emoticonStage) emoticonStage = false;
+                                })),
                           ],
                         )),
                     Offstage(
-                        offstage: !emoticonStage || keyboardState,
+                        offstage: !emoticonStage || keyboardState || widget.mode == "SIGHTML",
                         child: Column(children: [
                           Container(
                               padding: EdgeInsets.only(top: 4, right: 16, bottom: 8, left: 16),
@@ -447,7 +493,7 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
                               ]))
                         ])),
                     Offstage(
-                        offstage: !imageStage || keyboardState,
+                        offstage: (!imageStage || keyboardState) || widget.mode == "SIGHTML",
                         child: Column(children: [
                           Container(
                               padding: EdgeInsets.only(top: 4, right: 16, bottom: 8, left: 16),

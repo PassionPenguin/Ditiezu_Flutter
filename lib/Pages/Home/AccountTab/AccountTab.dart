@@ -97,6 +97,9 @@ class _AccountTabState extends State<AccountTab> {
                 }();
               });
             }),
+            Setting("编辑个签", "编辑个性签名(SIGHTML)", () {
+              Routes.navigateTo(context, Routes.post, params: {"mode": "SIGHTML"});
+            }),
             Setting("版本数据", "当前版本 ${Application.CHANNEL} ${Application.VERSION_NAME}", () {}, type: Setting.TYPE_NOTING),
             Setting("隐私政策", null, () {
               Routes.navigateTo(context, "/privacy");

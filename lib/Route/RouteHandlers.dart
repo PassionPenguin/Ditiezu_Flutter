@@ -38,6 +38,9 @@ var postHandler = new Handler(handlerFunc: (BuildContext context, Map<String, Li
     case "EDIT":
       return Post.edit(pid: params["pid"].first.toString().toInt(), tid: params["tid"].first.toString().toInt(), fid: params["fid"].first.toString().toInt());
       break;
+    case "SIGHTML":
+      return Post.signature();
+      break;
     default:
       return Post.post(fid: params["fid"].first.toString().toInt());
   }
