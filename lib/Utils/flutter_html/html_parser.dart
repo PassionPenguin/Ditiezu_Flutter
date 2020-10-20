@@ -316,11 +316,10 @@ class HtmlParser extends StatelessWidget {
                           if (fid.toInt() != -1) Routes.navigateTo(context.buildContext, Routes.forum, params: {"page": page, "fid": fid});
                         }
                       }
-                    } else {
+                    } else
                       () async {
                         if (await canLaunch(href)) await launch(href);
                       }();
-                    }
                   };
               },
             ),
