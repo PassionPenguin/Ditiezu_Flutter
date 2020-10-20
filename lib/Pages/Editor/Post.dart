@@ -150,6 +150,7 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
       Future.delayed(Duration(seconds: 3), () {
         Routes.pop(context);
       });
+      return;
     } else {
       submitState = "TRUE";
       setState(() {
@@ -163,6 +164,7 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
           });
         });
       });
+      return;
     }
     var response = str.substring(str.indexOf("', '", str.indexOf("handle")) + 4, str.indexOf("'", str.indexOf("', '", str.indexOf("handle")) + 4));
     if (str != "") {
