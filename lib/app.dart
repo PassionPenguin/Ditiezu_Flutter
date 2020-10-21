@@ -15,8 +15,8 @@ class Application {
   static double statusBarHeight;
   static double bottomBarHeight;
   static User user;
-  static const int VERSION_CODE = 4;
-  static const String VERSION_NAME = "0.3.2";
+  static const int VERSION_CODE = 6;
+  static const String VERSION_NAME = "0.3.4";
   static const String CHANNEL = "dev";
 
   static init(context) async {

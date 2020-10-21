@@ -134,37 +134,39 @@ class _PostState extends State<Post> with TickerProviderStateMixin {
     setState(() {
       isLoading = false;
     });
-    if (widget.mode == "SIGHTML" && str == '''<script type="text/javascript">parent.show_success('');</script>''') {
+    if (widget.mode == "SIGHTML") {
       Application.sp.setString("SIGHTML", controller.text);
-      setState(() {
-        isMessageShowing = true;
-        message = "成功编辑保存";
-        icon = Icons.check;
-        color = Colors.green;
-        Future.delayed(Duration(seconds: 2), () {
-          setState(() {
-            isMessageShowing = false;
+      if (str == '''<script type="text/javascript">parent.show_success('');</script>''') {
+        setState(() {
+          isMessageShowing = true;
+          message = "成功编辑保存";
+          icon = Icons.check;
+          color = Colors.green;
+          Future.delayed(Duration(seconds: 2), () {
+            setState(() {
+              isMessageShowing = false;
+            });
           });
         });
-      });
-      Future.delayed(Duration(seconds: 3), () {
-        Routes.pop(context);
-      });
-      return;
-    } else {
-      submitState = "TRUE";
-      setState(() {
-        isMessageShowing = true;
-        message = "保存失败";
-        icon = Icons.close;
-        color = Colors.red;
-        Future.delayed(Duration(seconds: 2), () {
-          setState(() {
-            isMessageShowing = false;
+        Future.delayed(Duration(seconds: 3), () {
+          Routes.pop(context);
+        });
+        return;
+      } else {
+        submitState = "TRUE";
+        setState(() {
+          isMessageShowing = true;
+          message = "保存失败";
+          icon = Icons.close;
+          color = Colors.red;
+          Future.delayed(Duration(seconds: 2), () {
+            setState(() {
+              isMessageShowing = false;
+            });
           });
         });
-      });
-      return;
+        return;
+      }
     }
     var response = str.substring(str.indexOf("', '", str.indexOf("handle")) + 4, str.indexOf("'", str.indexOf("', '", str.indexOf("handle")) + 4));
     if (str != "") {
