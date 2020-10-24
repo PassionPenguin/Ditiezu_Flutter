@@ -5,15 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:universal_html/parsing.dart';
 
-import '../../../Data/Arrays.dart';
-import '../../../Models/User.dart';
-import '../../../Network/Network.dart';
-import '../../../Provider/UserModel.dart';
-import '../../../Route/Routes.dart';
-import '../../../Widgets/v_empty_view.dart';
-import '../../../Widgets/w_iconMessage.dart';
-import '../../../Widgets/w_input.dart';
-import '../../../app.dart';
+import '../Data/Arrays.dart';
+import '../Models/User.dart';
+import '../Network/Network.dart';
+import '../Provider/UserModel.dart';
+import '../Route/Routes.dart';
+import '../Widgets/v_empty_view.dart';
+import '../Widgets/w_iconMessage.dart';
+import '../Widgets/w_input.dart';
+import '../app.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -144,112 +144,113 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           child: new FadeTransition(
               opacity: _fadeAnimation["main"],
               child: Container(
-                padding: EdgeInsets.only(
-                  left: 80,
-                  right: 80,
-                  top: 30,
-                ),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-                  Hero(
-                    tag: 'logo',
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                      VEmptyView(6),
-                      Text(
-                        'Welcome Back!',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                          fontSize: 34,
-                        ),
-                      ),
-                      VEmptyView(6),
-                      Text(
-                        'The Flutter Ditiezu App',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ]),
+                  padding: EdgeInsets.only(
+                    left: 80,
+                    right: 80,
+                    top: 30,
                   ),
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                    SizedBox(height: 24),
-                    TextInput(_usrNameController, TextInputType.text, prefix: Row(children: [Padding(padding: EdgeInsets.only(left: 12)), Icon(Icons.person, color: Colors.grey, size: 16)]), placeholder: "用户名"),
-                    SizedBox(height: 24),
-                    TextInput(_pwdController, TextInputType.visiblePassword, prefix: Row(children: [Padding(padding: EdgeInsets.only(left: 12)), Icon(Icons.lock, color: Colors.grey, size: 16)]), placeholder: "密码", obscureText: true),
-                    SizedBox(height: 24),
-                    Row(children: [
-                      Container(
-                        width: 60,
-                        height: 36,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(4.0), color: Colors.white),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            GestureDetector(
-                                onTap: () {
-                                  () async {
-                                    codeImage = await loadCode();
-                                    setState(() {});
-                                  }();
-                                },
-                                child: Image(image: codeImage, width: 48, fit: BoxFit.contain))
-                          ],
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                    Hero(
+                      tag: 'TitleText',
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                        VEmptyView(6),
+                        Text(
+                          'Welcome Back!',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                            fontSize: 34,
+                          ),
                         ),
-                      ),
-                      Expanded(child: TextInput(_codeController, TextInputType.text, prefix: Row(children: [Padding(padding: EdgeInsets.only(left: 12)), Icon(Icons.code, color: Colors.grey, size: 16)]), placeholder: "验证码"))
+                        VEmptyView(6),
+                        Text(
+                          'The Flutter Ditiezu App',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ]),
+                    ),
+                    Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                      SizedBox(height: 24),
+                      TextInput(_usrNameController, TextInputType.text, prefix: Row(children: [Padding(padding: EdgeInsets.only(left: 12)), Icon(Icons.person, color: Colors.grey, size: 16)]), placeholder: "用户名"),
+                      SizedBox(height: 24),
+                      TextInput(_pwdController, TextInputType.visiblePassword, prefix: Row(children: [Padding(padding: EdgeInsets.only(left: 12)), Icon(Icons.lock, color: Colors.grey, size: 16)]), placeholder: "密码", obscureText: true),
+                      SizedBox(height: 24),
+                      Row(children: [
+                        Container(
+                          width: 60,
+                          height: 36,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(4.0), color: Colors.white),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              GestureDetector(
+                                  onTap: () {
+                                    () async {
+                                      codeImage = await loadCode();
+                                      setState(() {});
+                                    }();
+                                  },
+                                  child: Image(image: codeImage, width: 48, fit: BoxFit.contain))
+                            ],
+                          ),
+                        ),
+                        Expanded(child: TextInput(_codeController, TextInputType.text, prefix: Row(children: [Padding(padding: EdgeInsets.only(left: 12)), Icon(Icons.code, color: Colors.grey, size: 16)]), placeholder: "验证码"))
+                      ]),
+                      SizedBox(height: 12),
+                      Row(children: [
+                        Expanded(
+                            child: DropdownButton<String>(
+                                style: TextStyle(fontSize: 14, color: Colors.black),
+                                items: questionName.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                                onChanged: (value) {
+                                  questionID = questionName.indexOf(value);
+                                  setState(() {});
+                                },
+                                value: questionName[questionID]))
+                      ]),
+                      Row(children: [
+                        Expanded(child: TextInput(_questionController, TextInputType.text, prefix: Row(children: [Padding(padding: EdgeInsets.only(left: 12)), Icon(Icons.question_answer, color: Colors.grey, size: 16)]), placeholder: "答案"))
+                      ]),
+                      SizedBox(height: 12),
+                      Row(children: [
+                        Expanded(
+                            child: MaterialButton(
+                          height: 48,
+                          elevation: 0,
+                          child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 8),
+                              child: Wrap(children: [
+                                Offstage(
+                                    offstage: isLoading,
+                                    child: AnimatedOpacity(
+                                        opacity: isLoading ? 0 : 1, duration: Duration(seconds: 1), child: SizedBox(height: 20, child: Text("登录", style: TextStyle(color: Colors.black, fontSize: 14, height: 1.4, fontWeight: FontWeight.w400))))),
+                                Offstage(
+                                    offstage: !isLoading,
+                                    child: AnimatedOpacity(
+                                        opacity: isLoading ? 1 : 0,
+                                        duration: Duration(seconds: 1),
+                                        child: SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              valueColor: AlwaysStoppedAnimation(Colors.white),
+                                              backgroundColor: Colors.lightBlue[200],
+                                              strokeWidth: 3,
+                                            ))))
+                              ])),
+                          onPressed: performLogin,
+                          color: Colors.lightBlue[200],
+                        ))
+                      ]),
+                      VEmptyView(24),
+                      Row(mainAxisAlignment: MainAxisAlignment.end, children: [Image.asset("assets/images/vector_welcome.png", width: 128)])
                     ]),
-                    SizedBox(height: 12),
-                    Row(children: [
-                      Expanded(
-                          child: DropdownButton<String>(
-                              items: questionName.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                              onChanged: (value) {
-                                questionID = questionName.indexOf(value);
-                                setState(() {});
-                              },
-                              value: questionName[questionID]))
-                    ]),
-                    Row(children: [
-                      Expanded(child: TextInput(_questionController, TextInputType.text, prefix: Row(children: [Padding(padding: EdgeInsets.only(left: 12)), Icon(Icons.question_answer, color: Colors.grey, size: 16)]), placeholder: "答案"))
-                    ]),
-                    SizedBox(height: 12),
-                    Row(children: [
-                      Expanded(
-                          child: MaterialButton(
-                        height: 48,
-                        elevation: 0,
-                        child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 8),
-                            child: Wrap(children: [
-                              Offstage(
-                                  offstage: isLoading,
-                                  child: AnimatedOpacity(
-                                      opacity: isLoading ? 0 : 1, duration: Duration(seconds: 1), child: SizedBox(height: 20, child: Text("登录", style: TextStyle(color: Colors.black, fontSize: 14, height: 1.4, fontWeight: FontWeight.w400))))),
-                              Offstage(
-                                  offstage: !isLoading,
-                                  child: AnimatedOpacity(
-                                      opacity: isLoading ? 1 : 0,
-                                      duration: Duration(seconds: 1),
-                                      child: SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: CircularProgressIndicator(
-                                            valueColor: AlwaysStoppedAnimation(Colors.white),
-                                            backgroundColor: Colors.lightBlue[200],
-                                            strokeWidth: 3,
-                                          ))))
-                            ])),
-                        onPressed: performLogin,
-                        color: Colors.lightBlue[200],
-                      ))
-                    ])
-                  ]),
-                  VEmptyView(12),
-                  Image.asset("assets/images/LoginBackground.png")
-                ]),
-              ))),
-      new Visibility(visible: isMessageShowing, child: new FadeTransition(opacity: _fadeAnimation["messaging"], child: Center(child: IconMessage(icon: icon, color: color, message: message))))
+                  ])))),
+      new Visibility(visible: isMessageShowing, child: new FadeTransition(opacity: _fadeAnimation["messaging"], child: Center(child: IconMessage(icon: icon, color: color, message: message)))),
+//      Positioned(child: , bottom: 0, right: 0)
     ]);
     return Scaffold(
       backgroundColor: Colors.white,

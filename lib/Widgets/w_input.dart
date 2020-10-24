@@ -10,6 +10,7 @@ class TextInput extends StatelessWidget {
       obscureText: obscureText,
       controller: controller,
       keyboardType: keyboardType,
+      style: TextStyle(fontSize: 14)
     );
   }
 
