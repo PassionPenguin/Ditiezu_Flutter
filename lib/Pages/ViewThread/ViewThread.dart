@@ -177,15 +177,16 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin, 
     ]);
     return Scaffold(
         appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: GestureDetector(
-                child: Icon(Icons.arrow_back_ios, color: Colors.black),
-                onTap: () {
-                  Routes.pop(context);
-                }),
-            title: Text(title, style: TextStyle(color: Colors.black)),
-            actions: [Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.search, color: Colors.black)), Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.more_vert, color: Colors.black))]),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: GestureDetector(
+              child: Icon(Icons.arrow_back_ios, color: Colors.black),
+              onTap: () {
+                Routes.pop(context);
+              }),
+          title: Text(title, style: TextStyle(color: Colors.black)),
+//            actions: [Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.search, color: Colors.black)), Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.more_vert, color: Colors.black))]
+        ),
         body: el);
   }
 
