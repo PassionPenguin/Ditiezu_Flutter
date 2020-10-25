@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:Ditiezu/Widgets/InteractivePage.dart';
 import 'package:flutter/cupertino.dart' hide Element;
 import 'package:flutter/material.dart' hide Element;
 import 'package:universal_html/html.dart' show Element;
@@ -10,7 +11,6 @@ import '../../Network/Network.dart';
 import '../../Route/Routes.dart';
 import "../../Utils/Exts.dart";
 import '../../Utils/flutter_html/flutter_html.dart';
-import '../../Widgets/w_loading.dart';
 import '../../Widgets/w_radius_button.dart';
 import '../../Widgets/w_round_img.dart';
 import '../../Widgets/w_toast/w_toast.dart' hide Toast;
@@ -26,7 +26,7 @@ class ViewThread extends StatefulWidget {
   _ViewThreadState createState() => _ViewThreadState();
 }
 
-class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
+class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin, InteractivePage {
   int tid;
   String fid;
   String response;
@@ -38,14 +38,13 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
   int pages = 1;
   int currentPage;
 
-  LoadingWidget lw;
-
   bool scoreEnabled;
 
   @override
   void initState() {
     tid = widget.tid;
     currentPage = widget.page;
+    super.bindIntractableWidgets(true, this);
     Future.delayed(Duration(seconds: 1), () {
       _contentResolver();
     });
@@ -54,17 +53,128 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    if (messageText != null)
-      return Scaffold(
-          appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              leading: GestureDetector(
-                  child: Icon(Icons.arrow_back_ios, color: Colors.black),
-                  onTap: () {
-                    Routes.pop(context);
-                  })),
-          body: Stack(alignment: Alignment.center, children: [Positioned(top: 120, child: Text(messageText, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)))]));
+    var el = Stack(children: [
+      new Visibility(
+          visible: !isMessageShowing,
+          child: new FadeTransition(
+              opacity: fadeAnimation["main"],
+              child: SafeArea(
+                  bottom: true,
+                  child: ListView.builder(
+                      itemBuilder: (BuildContext ctx, int index) {
+                        if (index == posts.length)
+                          return Container(
+                              margin: EdgeInsets.symmetric(vertical: 16),
+                              alignment: Alignment.topCenter,
+                              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                Offstage(
+                                    offstage: !(currentPage >= 2),
+                                    child: radiusButton(
+                                        child: Icon(Icons.chevron_left, size: 18),
+                                        action: () {
+                                          currentPage--;
+                                          _contentResolver();
+                                        })),
+                                Offstage(
+                                    offstage: !(currentPage >= 3),
+                                    child: radiusButton(
+                                        child: Text((currentPage - 2).toString()),
+                                        action: () {
+                                          currentPage -= 2;
+                                          _contentResolver();
+                                        })),
+                                Offstage(
+                                    offstage: !(currentPage >= 2),
+                                    child: radiusButton(
+                                        child: Text((currentPage - 1).toString()),
+                                        action: () {
+                                          currentPage--;
+                                          _contentResolver();
+                                        })),
+                                Offstage(offstage: pages == 1, child: radiusButton(child: Text((currentPage).toString()), action: () {}, colored: false)),
+                                Offstage(
+                                    offstage: !(currentPage <= pages - 1),
+                                    child: radiusButton(
+                                        child: Text((currentPage + 1).toString()),
+                                        action: () {
+                                          currentPage++;
+                                          _contentResolver();
+                                        })),
+                                Offstage(
+                                    offstage: !(currentPage <= pages - 2),
+                                    child: radiusButton(
+                                        child: Text((currentPage + 2).toString()),
+                                        action: () {
+                                          currentPage += 2;
+                                          _contentResolver();
+                                        })),
+                                Offstage(
+                                    offstage: !(currentPage <= pages - 1),
+                                    child: radiusButton(
+                                        child: Icon(Icons.chevron_right, size: 18),
+                                        action: () {
+                                          currentPage++;
+                                          _contentResolver();
+                                        })),
+                              ]));
+
+                        var data = posts[index];
+                        return Container(
+                            padding: EdgeInsets.all(16),
+                            child: Column(children: [
+                              Row(children: [
+                                Padding(padding: EdgeInsets.only(right: 8), child: RoundImgWidget("http://ditiezu.com/uc_server/avatar.php?mod=avatar&uid=${data.authorUID}", 36)),
+                                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                  Text(data.authorName, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600), textAlign: TextAlign.left),
+                                  Text(data.postTime, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Colors.grey), textAlign: TextAlign.left)
+                                ])
+                              ]),
+                              Container(
+                                  padding: EdgeInsets.only(left: 36, top: 12),
+                                  child: Column(children: [
+                                    Html(data: data.content),
+                                    Row(children: [
+                                      Padding(
+                                          padding: EdgeInsets.all(7),
+                                          child: GestureDetector(
+                                              onTap: () {
+                                                () async {
+                                                  await Routes.navigateTo(context, "/post", params: {"mode": "REPLY", "tid": tid.toString(), "fid": fid.toString(), "pid": data.pid.toString()});
+                                                  _contentResolver();
+                                                }();
+                                              },
+                                              child: Text("回复", style: TextStyle(color: Colors.grey[600])))),
+                                      Visibility(
+                                          visible: scoreEnabled,
+                                          child: Padding(
+                                              padding: EdgeInsets.all(7),
+                                              child: GestureDetector(
+                                                  onTap: () {
+                                                    () async {
+                                                      _requestScore(data.pid);
+                                                      _contentResolver();
+                                                    }();
+                                                  },
+                                                  child: Text("评分", style: TextStyle(color: Colors.grey[600]))))),
+                                      Visibility(
+                                          visible: data.editable,
+                                          child: Padding(
+                                              padding: EdgeInsets.all(7),
+                                              child: GestureDetector(
+                                                  onTap: () {
+                                                    () async {
+                                                      await Routes.navigateTo(context, "/post", params: {"mode": "EDIT", "tid": tid.toString(), "fid": fid.toString(), "pid": data.pid.toString()});
+                                                      _contentResolver();
+                                                    }();
+                                                  },
+                                                  child: Text("编辑", style: TextStyle(color: Colors.grey[600]))))),
+                                    ])
+                                  ]))
+                            ]));
+                      },
+                      itemCount: posts.length + 1)))),
+      new Visibility(visible: isLoading, child: new FadeTransition(opacity: fadeAnimation["loading"], child: Center(child: CircularProgressIndicator())))
+    ]);
     return Scaffold(
         appBar: AppBar(
             backgroundColor: Colors.transparent,
@@ -76,134 +186,18 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
                 }),
             title: Text(title, style: TextStyle(color: Colors.black)),
             actions: [Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.search, color: Colors.black)), Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.more_vert, color: Colors.black))]),
-        body: SafeArea(
-            bottom: true,
-            child: ListView.builder(
-                itemBuilder: (BuildContext ctx, int index) {
-                  if (index == posts.length)
-                    return Container(
-                        margin: EdgeInsets.symmetric(vertical: 16),
-                        alignment: Alignment.topCenter,
-                        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          Offstage(
-                              offstage: !(currentPage >= 2),
-                              child: radiusButton(
-                                  child: Icon(Icons.chevron_left, size: 18),
-                                  action: () {
-                                    currentPage--;
-                                    _contentResolver();
-                                  })),
-                          Offstage(
-                              offstage: !(currentPage >= 3),
-                              child: radiusButton(
-                                  child: Text((currentPage - 2).toString()),
-                                  action: () {
-                                    currentPage -= 2;
-                                    _contentResolver();
-                                  })),
-                          Offstage(
-                              offstage: !(currentPage >= 2),
-                              child: radiusButton(
-                                  child: Text((currentPage - 1).toString()),
-                                  action: () {
-                                    currentPage--;
-                                    _contentResolver();
-                                  })),
-                          Offstage(offstage: pages == 1, child: radiusButton(child: Text((currentPage).toString()), action: () {}, colored: false)),
-                          Offstage(
-                              offstage: !(currentPage <= pages - 1),
-                              child: radiusButton(
-                                  child: Text((currentPage + 1).toString()),
-                                  action: () {
-                                    currentPage++;
-                                    _contentResolver();
-                                  })),
-                          Offstage(
-                              offstage: !(currentPage <= pages - 2),
-                              child: radiusButton(
-                                  child: Text((currentPage + 2).toString()),
-                                  action: () {
-                                    currentPage += 2;
-                                    _contentResolver();
-                                  })),
-                          Offstage(
-                              offstage: !(currentPage <= pages - 1),
-                              child: radiusButton(
-                                  child: Icon(Icons.chevron_right, size: 18),
-                                  action: () {
-                                    currentPage++;
-                                    _contentResolver();
-                                  })),
-                        ]));
-
-                  var data = posts[index];
-                  return Container(
-                      padding: EdgeInsets.all(16),
-                      child: Column(children: [
-                        Row(children: [
-                          Padding(padding: EdgeInsets.only(right: 8), child: RoundImgWidget("http://ditiezu.com/uc_server/avatar.php?mod=avatar&uid=${data.authorUID}", 36)),
-                          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text(data.authorName, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600), textAlign: TextAlign.left),
-                            Text(data.postTime, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Colors.grey), textAlign: TextAlign.left)
-                          ])
-                        ]),
-                        Container(
-                            padding: EdgeInsets.only(left: 36, top: 12),
-                            child: Column(children: [
-                              Html(data: data.content),
-                              Row(children: [
-                                Padding(
-                                    padding: EdgeInsets.all(7),
-                                    child: GestureDetector(
-                                        onTap: () {
-                                          () async {
-                                            await Routes.navigateTo(context, "/post", params: {"mode": "REPLY", "tid": tid.toString(), "fid": fid.toString(), "pid": data.pid.toString()});
-                                            _contentResolver();
-                                          }();
-                                        },
-                                        child: Text("回复", style: TextStyle(color: Colors.grey[600])))),
-                                Visibility(
-                                    visible: scoreEnabled,
-                                    child: Padding(
-                                        padding: EdgeInsets.all(7),
-                                        child: GestureDetector(
-                                            onTap: () {
-                                              () async {
-                                                _requestScore(data.pid);
-                                                _contentResolver();
-                                              }();
-                                            },
-                                            child: Text("评分", style: TextStyle(color: Colors.grey[600]))))),
-                                Visibility(
-                                    visible: data.editable,
-                                    child: Padding(
-                                        padding: EdgeInsets.all(7),
-                                        child: GestureDetector(
-                                            onTap: () {
-                                              () async {
-                                                await Routes.navigateTo(context, "/post", params: {"mode": "EDIT", "tid": tid.toString(), "fid": fid.toString(), "pid": data.pid.toString()});
-                                                _contentResolver();
-                                              }();
-                                            },
-                                            child: Text("编辑", style: TextStyle(color: Colors.grey[600]))))),
-                              ])
-                            ]))
-                      ]));
-                },
-                itemCount: posts.length + 1)));
+        body: el);
   }
 
   _contentResolver() {
-    lw = LoadingWidget(context);
+    setLoading();
     try {
       () async {
         posts = [];
         var response = await NetWork().get("http://www.ditiezu.com/forum.php?mod=viewthread&tid=$tid&page=$currentPage");
         var doc = parseHtmlDocument(response);
         if (doc.querySelector("#messagetext") != null) {
-          messageText = doc.querySelector("#messagetext p").text;
-          lw.onCancel();
-          setState(() {});
+          setAnim(false, true, doc.querySelector("#messagetext p").text, Colors.red, Icons.clear);
           return;
         }
         fid = doc.querySelector("#dzsearchforumid").attributes["value"];
@@ -270,10 +264,10 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
         });
         if (doc.querySelector("#pgt .pg") != null) pages = int.parse(doc.querySelector("#pgt .pg").querySelectorAll("*:not(.nxt)").last.text.replaceFirst("... ", ""));
         setState(() {});
-        lw.onCancel();
+        clearAnim();
       }();
     } catch (e) {
-      lw.onCancel();
+      clearAnim();
     }
   }
 
@@ -304,10 +298,5 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin {
           return Positioned(bottom: 0, left: 0, right: 0, child: child);
         });
     _fadeController.forward();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

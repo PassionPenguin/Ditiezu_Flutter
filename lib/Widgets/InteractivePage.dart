@@ -47,6 +47,18 @@ abstract class InteractivePage {
     return IconMessage(icon: _icon, color: _color, message: _message);
   }
 
+  void setLoading() {
+    fadeController["loading"].forward();
+    fadeController["main"].reverse();
+    fadeController["messaging"].reverse();
+    if (_parentState.mounted)
+      // ignore: invalid_use_of_protected_member
+      _parentState.setState(() {
+        _isLoading = true;
+        _isMessageShowing = false;
+      });
+  }
+
   void setAnim(bool isLoading, bool isMessageShowing, String message, Color color, IconData icon) {
     if (isMessageShowing) {
       fadeController["main"].reverse();
@@ -85,6 +97,19 @@ abstract class InteractivePage {
         });
       // ignore: invalid_use_of_protected_member
     }
+  }
+
+  void clearAnim(){
+    fadeController["loading"].reverse();
+    fadeController["messaging"].reverse();
+    fadeController["main"].forward();
+
+    if (_parentState.mounted)
+      // ignore: invalid_use_of_protected_member
+      _parentState.setState(() {
+        _isLoading = false;
+        _isMessageShowing = false;
+      });
   }
 
   // Preferences

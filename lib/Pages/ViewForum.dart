@@ -1,3 +1,4 @@
+import 'package:Ditiezu/Widgets/InteractivePage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:universal_html/parsing.dart';
@@ -9,7 +10,6 @@ import '../Models/ThreadItem.dart';
 import '../Network/Network.dart';
 import '../Route/Routes.dart';
 import '../Utils/dropdown_menu/dropdown_menu.dart';
-import '../Widgets/w_loading.dart';
 import '../Widgets/w_radius_button.dart';
 
 class ViewForum extends StatefulWidget {
@@ -18,20 +18,14 @@ class ViewForum extends StatefulWidget {
   final fid;
 
   @override
-  _ViewForumState createState() => _ViewForumState(fid);
+  _ViewForumState createState() => _ViewForumState();
 }
 
-class _ViewForumState extends State<ViewForum> {
-  _ViewForumState(this.fid) {
-    cur = categoryList.firstWhere((element) => element.categoryID == fid);
-  }
-
+class _ViewForumState extends State<ViewForum> with TickerProviderStateMixin, InteractivePage {
   int currentPage = 1;
   int pages = 1;
   int fid;
   CategoryItem cur;
-
-  LoadingWidget lw;
 
   List<SelectItem> _typesList = [SelectItem.full(name: "全部", isSelected: true, id: -1)];
   SelectItem selectedType = SelectItem.full(name: "全部", isSelected: true, id: -1);
@@ -57,6 +51,9 @@ class _ViewForumState extends State<ViewForum> {
 
   @override
   void initState() {
+    fid = widget.fid;
+    cur = categoryList.firstWhere((element) => element.categoryID == fid);
+    super.bindIntractableWidgets(true, this);
     Future.delayed(Duration(seconds: 1), () {
       _contentResolver();
     });
@@ -65,180 +62,186 @@ class _ViewForumState extends State<ViewForum> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SafeArea(
-            bottom: true,
-            child: DefaultDropdownMenuController(
-              child: Column(children: [
-                AppBar(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    leading: GestureDetector(
-                        child: Icon(Icons.arrow_back_ios, color: Colors.black),
-                        onTap: () {
-                          Routes.pop(context);
-                        }),
-                    title: Text(cur.categoryName, style: TextStyle(color: Colors.black)),
-                    actions: [Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.search, color: Colors.black)), Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.more_vert, color: Colors.black))],
-                    flexibleSpace: Column()),
-                DropdownHeader(
-                    onTap: (int index) {
-                      DropdownMenuController controller = DefaultDropdownMenuController.of(globalKey.currentContext);
-                      controller.show(index);
-                    },
-                    titles: [selectedType.name, _filtersList[filtersParam.indexOf(filter)].name]),
-                Expanded(
-                    child: Stack(key: globalKey, children: [
-                  ListView.builder(
-                      itemBuilder: (BuildContext ctx, int index) {
-                        if (index == forumList.length)
-                          return Container(
-                              margin: EdgeInsets.symmetric(vertical: 16),
-                              alignment: Alignment.topCenter,
-                              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                Offstage(
-                                    offstage: !(currentPage >= 2),
-                                    child: radiusButton(
-                                        child: Icon(Icons.chevron_left, size: 18),
-                                        action: () {
-                                          currentPage--;
-                                          _contentResolver();
-                                        })),
-                                Offstage(
-                                    offstage: !(currentPage >= 3),
-                                    child: radiusButton(
-                                        child: Text((currentPage - 2).toString()),
-                                        action: () {
-                                          currentPage -= 2;
-                                          _contentResolver();
-                                        })),
-                                Offstage(
-                                    offstage: !(currentPage >= 2),
-                                    child: radiusButton(
-                                        child: Text((currentPage - 1).toString()),
-                                        action: () {
-                                          currentPage--;
-                                          _contentResolver();
-                                        })),
-                                Offstage(offstage: pages == 1, child: radiusButton(child: Text((currentPage).toString()), action: () {}, colored: false)),
-                                Offstage(
-                                    offstage: !(currentPage <= pages - 1),
-                                    child: radiusButton(
-                                        child: Text((currentPage + 1).toString()),
-                                        action: () {
-                                          currentPage++;
-                                          _contentResolver();
-                                        })),
-                                Offstage(
-                                    offstage: !(currentPage <= pages - 2),
-                                    child: radiusButton(
-                                        child: Text((currentPage + 2).toString()),
-                                        action: () {
-                                          currentPage += 2;
-                                          _contentResolver();
-                                        })),
-                                Offstage(
-                                    offstage: !(currentPage <= pages - 1),
-                                    child: radiusButton(
-                                        child: Icon(Icons.chevron_right, size: 18),
-                                        action: () {
-                                          currentPage++;
-                                          _contentResolver();
-                                        })),
-                              ]));
-                        else if (index >= forumList.length) return Container();
-                        var data = forumList[index];
-                        var dt = data.pubDate;
-                        TextSpan tp = () {
-                          var c = <InlineSpan>[];
-                          c.add(TextSpan(text: data.badge, style: TextStyle(fontSize: 18.5, fontWeight: FontWeight.w400, color: Colors.lightBlue)));
-                          c.add(TextSpan(text: data.threadTitle, style: TextStyle(fontSize: 18.5, fontWeight: FontWeight.w600, color: Colors.black87)));
-                          if (data.isNew) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_new.png", height: 14))));
-                          if (data.isHot) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_hot.png", height: 14))));
-                          if (data.withImage) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_image.png", height: 14))));
-                          if (data.withAttachment) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_attachment.png", height: 14))));
-                          return TextSpan(children: c);
-                        }();
-                        return SafeArea(
-                            top: false,
-                            bottom: false,
-                            child: InkWell(
-                                onTap: () {
-                                  Routes.navigateTo(context, Routes.thread, params: {'tid': data.threadID.toString(), "page": data.threadPage.toString()});
-                                },
-                                child: Padding(
-                                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, right: 24.0),
-                                    child: Row(children: [
-                                      Padding(padding: EdgeInsets.only(left: 24.0)),
-                                      Expanded(
-                                          child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(padding: EdgeInsets.only(top: 8)),
-                                          Text.rich(tp),
-                                          Padding(padding: EdgeInsets.only(top: 8)),
-                                          Text("${data.authorName} $dt", style: TextStyle(fontSize: 12)),
-                                          if (data.threadContent.trim().isNotEmpty) Column(children: [Padding(padding: EdgeInsets.only(top: 4)), Text(data.threadContent, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400), maxLines: 3)]),
-                                          Padding(padding: EdgeInsets.only(top: 8)),
-                                          Row(children: [
-                                            Text(data.views.toString() + " 查看", style: TextStyle(color: Colors.black45)),
-                                            Padding(padding: EdgeInsets.only(left: 8)),
-                                            Text(data.replies.toString() + " 回复", style: TextStyle(color: Colors.black45))
-                                          ])
-                                        ],
-                                      )),
-                                    ]))));
+    var el = Stack(children: [
+      new Visibility(
+          visible: !isMessageShowing,
+          child: new FadeTransition(
+              opacity: fadeAnimation["main"],
+              child: DefaultDropdownMenuController(
+                child: Column(children: [
+                  AppBar(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      leading: GestureDetector(
+                          child: Icon(Icons.arrow_back_ios, color: Colors.black),
+                          onTap: () {
+                            Routes.pop(context);
+                          }),
+                      title: Text(cur.categoryName, style: TextStyle(color: Colors.black)),
+                      actions: [Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.search, color: Colors.black)), Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.more_vert, color: Colors.black))],
+                      flexibleSpace: Column()),
+                  DropdownHeader(
+                      onTap: (int index) {
+                        DropdownMenuController controller = DefaultDropdownMenuController.of(globalKey.currentContext);
+                        controller.show(index);
                       },
-                      itemCount: forumList.length + 1),
-                  Positioned(
-                      right: 24,
-                      bottom: 24,
-                      child: FloatingActionButton(
-                          onPressed: () {
-                            () async {
-                              await Routes.navigateTo(context, "/post", params: {"mode": "NEW", "fid": fid.toString()});
-                              _contentResolver();
-                            }();
-                          },
-                          child: Icon(Icons.add))),
-                  DropdownMenu(maxMenuHeight: kDropdownMenuItemHeight * 10,
-                      //  activeIndex: activeIndex,
-                      menus: [
-                        new DropdownMenuBuilder(
-                            builder: (BuildContext context) {
-                              return new DropdownListMenu(
-                                selectedIndex: _typesList.indexOf(selectedType),
-                                data: _typesList,
-                                itemBuilder: buildCheckItem,
-                                callback: (index) {
-                                  typeID = true;
-                                  if (filter == "") filter = "typeid";
-                                  selectedType = _typesList[index];
-                                  currentPage = 1;
-                                  _contentResolver();
-                                  setState(() {});
-                                },
-                              );
+                      titles: [selectedType.name, _filtersList[filtersParam.indexOf(filter)].name]),
+                  Expanded(
+                      child: Stack(key: globalKey, children: [
+                    ListView.builder(
+                        itemBuilder: (BuildContext ctx, int index) {
+                          if (index == forumList.length)
+                            return Container(
+                                margin: EdgeInsets.symmetric(vertical: 16),
+                                alignment: Alignment.topCenter,
+                                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                  Offstage(
+                                      offstage: !(currentPage >= 2),
+                                      child: radiusButton(
+                                          child: Icon(Icons.chevron_left, size: 18),
+                                          action: () {
+                                            currentPage--;
+                                            _contentResolver();
+                                          })),
+                                  Offstage(
+                                      offstage: !(currentPage >= 3),
+                                      child: radiusButton(
+                                          child: Text((currentPage - 2).toString()),
+                                          action: () {
+                                            currentPage -= 2;
+                                            _contentResolver();
+                                          })),
+                                  Offstage(
+                                      offstage: !(currentPage >= 2),
+                                      child: radiusButton(
+                                          child: Text((currentPage - 1).toString()),
+                                          action: () {
+                                            currentPage--;
+                                            _contentResolver();
+                                          })),
+                                  Offstage(offstage: pages == 1, child: radiusButton(child: Text((currentPage).toString()), action: () {}, colored: false)),
+                                  Offstage(
+                                      offstage: !(currentPage <= pages - 1),
+                                      child: radiusButton(
+                                          child: Text((currentPage + 1).toString()),
+                                          action: () {
+                                            currentPage++;
+                                            _contentResolver();
+                                          })),
+                                  Offstage(
+                                      offstage: !(currentPage <= pages - 2),
+                                      child: radiusButton(
+                                          child: Text((currentPage + 2).toString()),
+                                          action: () {
+                                            currentPage += 2;
+                                            _contentResolver();
+                                          })),
+                                  Offstage(
+                                      offstage: !(currentPage <= pages - 1),
+                                      child: radiusButton(
+                                          child: Icon(Icons.chevron_right, size: 18),
+                                          action: () {
+                                            currentPage++;
+                                            _contentResolver();
+                                          })),
+                                ]));
+                          else if (index >= forumList.length) return Container();
+                          var data = forumList[index];
+                          var dt = data.pubDate;
+                          TextSpan tp = () {
+                            var c = <InlineSpan>[];
+                            c.add(TextSpan(text: data.badge, style: TextStyle(fontSize: 18.5, fontWeight: FontWeight.w400, color: Colors.lightBlue)));
+                            c.add(TextSpan(text: data.threadTitle, style: TextStyle(fontSize: 18.5, fontWeight: FontWeight.w600, color: Colors.black87)));
+                            if (data.isNew) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_new.png", height: 14))));
+                            if (data.isHot) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_hot.png", height: 14))));
+                            if (data.withImage) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_image.png", height: 14))));
+                            if (data.withAttachment) c.add(WidgetSpan(child: Padding(padding: EdgeInsets.only(left: 4, bottom: 3), child: Image.asset("assets/images/icn_attachment.png", height: 14))));
+                            return TextSpan(children: c);
+                          }();
+                          return SafeArea(
+                              top: false,
+                              bottom: false,
+                              child: InkWell(
+                                  onTap: () {
+                                    Routes.navigateTo(context, Routes.thread, params: {'tid': data.threadID.toString(), "page": data.threadPage.toString()});
+                                  },
+                                  child: Padding(
+                                      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, right: 24.0),
+                                      child: Row(children: [
+                                        Padding(padding: EdgeInsets.only(left: 24.0)),
+                                        Expanded(
+                                            child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(padding: EdgeInsets.only(top: 8)),
+                                            Text.rich(tp),
+                                            Padding(padding: EdgeInsets.only(top: 8)),
+                                            Text("${data.authorName} $dt", style: TextStyle(fontSize: 12)),
+                                            if (data.threadContent.trim().isNotEmpty) Column(children: [Padding(padding: EdgeInsets.only(top: 4)), Text(data.threadContent, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400), maxLines: 3)]),
+                                            Padding(padding: EdgeInsets.only(top: 8)),
+                                            Row(children: [
+                                              Text(data.views.toString() + " 查看", style: TextStyle(color: Colors.black45)),
+                                              Padding(padding: EdgeInsets.only(left: 8)),
+                                              Text(data.replies.toString() + " 回复", style: TextStyle(color: Colors.black45))
+                                            ])
+                                          ],
+                                        )),
+                                      ]))));
+                        },
+                        itemCount: forumList.length + 1),
+                    Positioned(
+                        right: 24,
+                        bottom: 24,
+                        child: FloatingActionButton(
+                            onPressed: () {
+                              () async {
+                                await Routes.navigateTo(context, "/post", params: {"mode": "NEW", "fid": fid.toString()});
+                                _contentResolver();
+                              }();
                             },
-                            height: kDropdownMenuItemHeight * _typesList.length),
-                        new DropdownMenuBuilder(
-                            builder: (BuildContext context) {
-                              return new DropdownListMenu(
-                                  selectedIndex: filtersParam.indexOf(filter),
-                                  data: _filtersList,
+                            child: Icon(Icons.add))),
+                    DropdownMenu(maxMenuHeight: kDropdownMenuItemHeight * 10,
+                        //  activeIndex: activeIndex,
+                        menus: [
+                          new DropdownMenuBuilder(
+                              builder: (BuildContext context) {
+                                return new DropdownListMenu(
+                                  selectedIndex: _typesList.indexOf(selectedType),
+                                  data: _typesList,
                                   itemBuilder: buildCheckItem,
                                   callback: (index) {
-                                    filter = filtersParam[index];
+                                    typeID = true;
+                                    if (filter == "") filter = "typeid";
+                                    selectedType = _typesList[index];
                                     currentPage = 1;
                                     _contentResolver();
                                     setState(() {});
-                                  });
-                            },
-                            height: kDropdownMenuItemHeight * _filtersList.length),
-                      ])
-                ]))
-              ]),
-            )));
+                                  },
+                                );
+                              },
+                              height: kDropdownMenuItemHeight * _typesList.length),
+                          new DropdownMenuBuilder(
+                              builder: (BuildContext context) {
+                                return new DropdownListMenu(
+                                    selectedIndex: filtersParam.indexOf(filter),
+                                    data: _filtersList,
+                                    itemBuilder: buildCheckItem,
+                                    callback: (index) {
+                                      filter = filtersParam[index];
+                                      currentPage = 1;
+                                      _contentResolver();
+                                      setState(() {});
+                                    });
+                              },
+                              height: kDropdownMenuItemHeight * _filtersList.length),
+                        ])
+                  ]))
+                ]),
+              ))),
+      new Visibility(visible: isLoading, child: new FadeTransition(opacity: fadeAnimation["loading"], child: Center(child: CircularProgressIndicator())))
+    ]);
+
+    return Scaffold(body: SafeArea(bottom: true, child: el));
   }
 
   queryParams() {
@@ -254,7 +257,7 @@ class _ViewForumState extends State<ViewForum> {
   }
 
   _contentResolver() {
-    lw = LoadingWidget(context);
+    setLoading();
     () async {
       var response = await NetWork().get("http://www.ditiezu.com/forum.php?mod=forumdisplay&fid=$fid&page=$currentPage" + queryParams());
       var document = parseHtmlDocument(response);
@@ -297,13 +300,7 @@ class _ViewForumState extends State<ViewForum> {
             element.querySelector("[alt='attachment']") != null));
       });
       setState(() {});
-      lw.onCancel();
+      clearAnim();
     }();
-  }
-
-  @override
-  void dispose() {
-    lw.onCancel();
-    super.dispose();
   }
 }
