@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:Ditiezu/Widgets/InteractivePage.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,7 +12,6 @@ import '../Network/Network.dart';
 import '../Provider/UserModel.dart';
 import '../Route/Routes.dart';
 import '../Widgets/v_empty_view.dart';
-import '../Widgets/w_iconMessage.dart';
 import '../Widgets/w_input.dart';
 import '../app.dart';
 
@@ -20,129 +20,37 @@ class LoginPage extends StatefulWidget {
   State<StatefulWidget> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
-  // InputController
+class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin, InteractivePage {
+  // InputControllers
   final TextEditingController _usrNameController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
   final TextEditingController _codeController = TextEditingController();
   final TextEditingController _questionController = TextEditingController();
+
+  // Verification code
   ImageProvider codeImage = AssetImage("assets/images/logo.png");
-  String codeHash;
+  String codeHash; // -> idhash
+  // QA Verification
   int questionID = 0;
-  bool isLoading = false;
+
+  // Form Url & Hash
   String formAction;
-  String formHash;
-
-  Future<NetworkImage> loadCode() async {
-    /**
-     * [Function] loadCode(hash: String)
-     * @param hash: String, the code hash (or sechash)
-     * @return null
-     * @purpose show security code -> ImageView
-     */
-    var response = await NetWork().get("http://www.ditiezu.com/misc.php?mod=seccode&action=update&idhash=$codeHash&inajax=1&ajaxtarget=seccode_");
-    var doc = parseHtmlDocument(parseXmlDocument(response).firstChild.text); // <CDATA>
-    return NetworkImage("http://www.ditiezu.com/" + doc.querySelector("img").attributes["src"], headers: {
-      "user-agent": "Mozilla/5.0 (Linux; Android 12;) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/66.0.3359.126 MQQBrowser/6.2 TBS/045111 Mobile Safari/537.36 Process/tools NetType/WIFI Language/zh_CN ABI/arm64",
-      "cookie": PersistCookieJar(dir: (await getApplicationDocumentsDirectory()).path + "/.cookies/").loadForRequest(Uri.http("www.ditiezu.com", "")).join("")
-    });
-  }
-
-  _init() {
-    () async {
-      if (await NetWork().checkLogin()) {
-        setState(() {
-          message = "正在跳转中";
-          color = Colors.green;
-          icon = Icons.check;
-          isMessageShowing = true;
-          isLoading = false;
-          Future.delayed(Duration(seconds: 2), () {
-            setState(() {
-              isMessageShowing = false;
-            });
-          });
-        });
-        Future.delayed(Duration(seconds: 2), () {
-          Routes.navigateTo(context, "/home");
-        });
-        return;
-      }
-
-      Directory appDocDir = await getApplicationDocumentsDirectory();
-      String appDocPath = appDocDir.path;
-      var cookieJar = PersistCookieJar(dir: appDocPath + "/.cookies/");
-      if (cookieJar.loadForRequest(Uri.http("www.ditiezu.com", "")).isEmpty) await NetWork().get("http://www.ditiezu.com/forum.php?mod=forum");
-      var response = await NetWork.mobile(autoRedirect: false).get("http://www.ditiezu.com/member.php?mod=logging&action=login&mobile=yes");
-      if (response.contains("./?mobile=yes")) {
-        setState(() {
-          message = "正在跳转中";
-          color = Colors.green;
-          icon = Icons.check;
-          isMessageShowing = true;
-          isLoading = false;
-          Future.delayed(Duration(seconds: 2), () {
-            setState(() {
-              isMessageShowing = false;
-            });
-          });
-        });
-        Future.delayed(Duration(seconds: 2), () {
-          Routes.navigateTo(context, "/home");
-        });
-        Application.user.loginState = true;
-        UserModel.saveUserInfo(Application.user);
-        return;
-      }
-      var doc = parseHtmlDocument(response);
-      codeHash = doc.querySelector(".scod").attributes["src"];
-      codeHash = codeHash.substring(codeHash.length - 5);
-      codeImage = await loadCode();
-      formAction = doc.querySelector("form").attributes["action"];
-      formHash = doc.querySelector("[name='formhash']").attributes["value"];
-      setState(() {});
-    }();
-  }
-
-  bool isMessageShowing = false;
-  String message = "";
-  IconData icon = Icons.check;
-  Color color = Colors.green;
-  Map<String, Animation<double>> _fadeAnimation = {};
-  Map<String, AnimationController> _fadeController = {};
-
-  String credit;
+  String formHash; // -> formhash
 
   @override
   void initState() {
-    _fadeController["main"] = new AnimationController(vsync: this, duration: Duration(seconds: 1));
-    _fadeController["messaging"] = new AnimationController(vsync: this, duration: Duration(seconds: 1));
-    _fadeAnimation["main"] = new Tween(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(_fadeController["main"]);
-    _fadeAnimation["messaging"] = new Tween(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(_fadeController["messaging"]);
     super.initState();
-    _init();
+    super.bindIntractableWidgets(false, this);
+    init();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isMessageShowing) {
-      _fadeController["main"].reverse();
-      _fadeController["messaging"].forward();
-    } else {
-      _fadeController["main"].forward();
-      _fadeController["messaging"].reverse();
-    }
     var el = Stack(children: [
       new Visibility(
           visible: !isMessageShowing,
           child: new FadeTransition(
-              opacity: _fadeAnimation["main"],
+              opacity: fadeAnimation["main"],
               child: Container(
                   padding: EdgeInsets.only(
                     left: 80,
@@ -249,7 +157,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                       Row(mainAxisAlignment: MainAxisAlignment.end, children: [Image.asset("assets/images/vector_welcome.png", width: 128)])
                     ]),
                   ])))),
-      new Visibility(visible: isMessageShowing, child: new FadeTransition(opacity: _fadeAnimation["messaging"], child: Center(child: IconMessage(icon: icon, color: color, message: message)))),
+      new Visibility(visible: isMessageShowing, child: new FadeTransition(opacity: fadeAnimation["messaging"], child: Center(child: icnMessage())))
 //      Positioned(child: , bottom: 0, right: 0)
     ]);
     return Scaffold(
@@ -267,34 +175,38 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
   void performLogin() async {
     setState(() {
-      isLoading = true;
+      isLoading = true; // This variable is mutable to indicate the SubmitButton's animation instead of the interactive page.
     });
+    /* [API] Login Form
+      @method POST
+      @url http://www.ditiezu.com/member.php?mod=logging&action=login&loginsubmit=yes&loginhash=[login hash]
+      @formData
+        (String) formhash, (static String) referer, (String, utf8) username, (String, utf8) password, (String) sechash, (String) secverify, (int) questionid, (String) answer, (static int) cookietime, (static String) submit
+      @expected
+        Succeed: $("#messagetext .mbn").text.contains("欢迎您回来")
+        Error: !Succeed
+     */
     var response = await NetWork.mobile(autoRedirect: false).post("http://www.ditiezu.com/$formAction",
         "formhash=$formHash&referer=http%3A%2F%2Fwww.ditiezu.com%2Fforum.php%3Fmod%3Dforum%26mobile%3Dyes&username=${Uri.encodeComponent(_usrNameController.text)}&password=${Uri.encodeComponent(_pwdController.text)}&sechash=$codeHash&seccodeverify=${Uri.encodeComponent(_codeController.text)}&questionid=$questionID&answer=${Uri.encodeComponent(_questionController.text)}&cookietime=15552000&submit=%E7%99%BB%E5%BD%95");
     var doc = parseHtmlDocument(response);
+
     if (response.contains("forum.php?mod=forum") && !response.contains("<head>") || doc.querySelector("#messagetext .mbn") == null) {
+      // Have logged in, but is needed to re-log in to get the username and the uid.
+      // The following code will remove the cookie and re-initialize the page.
       Directory appDocDir = await getApplicationDocumentsDirectory();
       String appDocPath = appDocDir.path;
       var cookieJar = PersistCookieJar(dir: appDocPath + "/.cookies/");
       cookieJar.deleteAll();
-      _init();
+      init();
       codeImage = await loadCode();
       setState(() {});
       return;
     }
+
     var status = doc.querySelector("#messagetext .mbn").text.contains("欢迎您回来");
-    setState(() {
-      message = doc.querySelector("#messagetext .mbn").text;
-      color = status ? Colors.green : Colors.red;
-      icon = status ? Icons.check : Icons.clear;
-      isMessageShowing = true;
-      Future.delayed(Duration(seconds: 2), () {
-        setState(() {
-          isMessageShowing = false;
-        });
-      });
-    });
+    setAnim(false, true, doc.querySelector("#messagetext .mbn").text, status ? Colors.green : Colors.red, status ? Icons.check : Icons.clear);
     if (status) {
+      // Save the username and the uid.
       var usr = User(
           uid: int.parse(response.substring(response.indexOf("discuz_uid = '") + 14, response.indexOf("'", response.indexOf("discuz_uid = '") + 14))),
           userName: response.substring(response.indexOf("欢迎您回来，") + 6, response.indexOf("。", response.indexOf("欢迎您回来，"))),
@@ -309,11 +221,72 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
       String appDocPath = appDocDir.path;
       var cookieJar = PersistCookieJar(dir: appDocPath + "/.cookies/");
       cookieJar.deleteAll();
-      _init();
+      init();
       codeImage = await loadCode();
       setState(() {});
     }
     isLoading = false;
     setState(() {});
+  }
+
+  Future<NetworkImage> loadCode() async {
+    /**
+     * [Function] loadCode(hash: String)
+     * @param hash: String, the code hash (or sechash)
+     * @return null
+     * @purpose show security code -> ImageView
+     */
+
+    /* [API] Login Verification Code Url Getter
+      @method GET
+      @url http://www.ditiezu.com/misc.php?mod=seccode&action=update&idhash=[code hash]&inajax=1&ajaxtarget=seccode_
+      @expected
+        Succeed: codeUrl = $("img").attributes["src"]
+     */
+    var response = await NetWork().get("http://www.ditiezu.com/misc.php?mod=seccode&action=update&idhash=$codeHash&inajax=1&ajaxtarget=seccode_");
+    var doc = parseHtmlDocument(parseXmlDocument(response).firstChild.text); // <CDATA>
+
+    /* [API] Login Verification Code Downloader
+      @method GET
+      @url http://www.ditiezu.com/misc.php?mod=seccode&update=[update]&idhash=[code hash]
+      @expected
+        Succeed: image data
+     */
+    return NetworkImage("http://www.ditiezu.com/" + doc.querySelector("img").attributes["src"], headers: {
+      "user-agent": "Mozilla/5.0 (Linux; Android 12;) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/66.0.3359.126 MQQBrowser/6.2 TBS/045111 Mobile Safari/537.36 Process/tools NetType/WIFI Language/zh_CN ABI/arm64",
+      "cookie": PersistCookieJar(dir: (await getApplicationDocumentsDirectory()).path + "/.cookies/").loadForRequest(Uri.http("www.ditiezu.com", "")).join("")
+    });
+  }
+
+  void init() {
+    () async {
+      Directory appDocDir = await getApplicationDocumentsDirectory();
+      String appDocPath = appDocDir.path;
+      var cookieJar = PersistCookieJar(dir: appDocPath + "/.cookies/");
+      if (await NetWork().checkLogin()) cookieJar.deleteAll(); // If is logged in but still here, then remove the cookie to perform a re-log in.
+
+      if (cookieJar.loadForRequest(Uri.http("www.ditiezu.com", "")).isEmpty) await NetWork().get("http://www.ditiezu.com/forum.php?mod=forum"); // This page requires cookie? existed or it will return an empty document.
+
+      /* [API] Login Page Retriever
+      @method GET
+      @url http://www.ditiezu.com/member.php?mod=logging&action=login&mobile=yes
+      @expected
+        Succeed: HTML document
+     */
+      var response = await NetWork.mobile(autoRedirect: false).get("http://www.ditiezu.com/member.php?mod=logging&action=login&mobile=yes");
+      if (response.contains("./?mobile=yes")) {
+        // If is logged in but still here, then remove the cookie to perform a re-log in.
+        cookieJar.deleteAll();
+        await NetWork().get("http://www.ditiezu.com/forum.php?mod=forum");
+        response = await NetWork.mobile(autoRedirect: false).get("http://www.ditiezu.com/member.php?mod=logging&action=login&mobile=yes");
+      }
+      var doc = parseHtmlDocument(response);
+      codeHash = doc.querySelector(".scod").attributes["src"];
+      codeHash = codeHash.substring(codeHash.length - 5);
+      codeImage = await loadCode();
+      formAction = doc.querySelector("form").attributes["action"];
+      formHash = doc.querySelector("[name='formhash']").attributes["value"];
+      setState(() {});
+    }();
   }
 }
