@@ -78,7 +78,7 @@ class _ViewForumState extends State<ViewForum> with TickerProviderStateMixin, In
                             Routes.pop(context);
                           }),
                       title: Text(cur.categoryName, style: TextStyle(color: Colors.black)),
-                      actions: [Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.search, color: Colors.black)), Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.more_vert, color: Colors.black))],
+//                      actions: [Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.search, color: Colors.black)), Padding(padding: EdgeInsets.only(left: 8, right: 8), child: Icon(Icons.more_vert, color: Colors.black))],
                       flexibleSpace: Column()),
                   DropdownHeader(
                       onTap: (int index) {

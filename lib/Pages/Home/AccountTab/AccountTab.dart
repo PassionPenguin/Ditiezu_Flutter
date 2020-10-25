@@ -71,12 +71,7 @@ class _AccountTabState extends State<AccountTab> {
                 padding: EdgeInsets.only(right: 16),
                 child: ClipRRect(borderRadius: BorderRadius.circular(48), child: Image(image: NetworkImage("http://ditiezu.com/uc_server/avatar.php?mod=avatar&uid=${Application.user.uid}"), width: 96, height: 96, fit: BoxFit.cover))),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Padding(
-                  padding: EdgeInsets.only(bottom: 12),
-                  child: Row(children: [
-                    Text(Application.user.userName, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    Padding(padding: EdgeInsets.only(left: 8, right: 2), child: Icon(Icons.qr_code, color: Colors.black)),
-                  ])),
+              Padding(padding: EdgeInsets.only(bottom: 12), child: Text(Application.user.userName, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
               Padding(padding: EdgeInsets.symmetric(vertical: 4), child: Text("UID: ${Application.user.uid}")),
               Padding(
                   padding: EdgeInsets.symmetric(vertical: 4),
