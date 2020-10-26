@@ -66,7 +66,8 @@ abstract class InteractivePage {
     if (_parentState.mounted) {
       // ignore: invalid_use_of_protected_member
       _parentState.setState(() {
-        _isMessageShowing = isMessageShowing;
+        _isLoading = false;
+        _isMessageShowing = true;
         _message = message;
         _color = color;
         _icon = _icon;
