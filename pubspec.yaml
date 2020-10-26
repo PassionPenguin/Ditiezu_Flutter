@@ -36,7 +36,6 @@ dependencies:
   provider: ^3.2.0
   flutter_svg: any
   flutter_screenutil: any
-  qr_flutter: ^3.1.0
   meta: ^1.1.5
   image_picker:
     path: lib/utils/image_picker
@@ -44,6 +43,8 @@ dependencies:
   flutter_native_image: ^0.0.5
   span_builder: ^0.1.0
   url_launcher: ^5.7.5
+  firebase_core: ^0.5.0+1
+  firebase_analytics: ^5.0.2
 
 
 dev_dependencies:
