@@ -1,6 +1,5 @@
-class ThreadItem<T> {
-  ThreadItem(this.threadTitle, this.threadContent, this.authorName, this.pubDate, this.badge, this.threadID, this.threadPage, this.authorUID, this.views, this.replies, this.isHot, this.isNew,
-      this.withImage, this.withAttachment);
+class ThreadItem {
+  ThreadItem(this.threadTitle, this.threadContent, this.authorName, this.pubDate, this.badge, this.threadID, this.threadPage, this.authorUID, this.views, this.replies, this.isHot, this.isNew, this.withImage, this.withAttachment, this.timeIsToday);
 
   ThreadItem.rss(this.threadTitle, this.threadContent, this.authorName, this.pubDate, this.badge, this.threadID, this.threadPage, this.enclosureUrl, this.authorUID, this.views, this.replies);
 
@@ -20,4 +19,5 @@ class ThreadItem<T> {
   bool isNew;
   bool withImage;
   bool withAttachment;
+  bool timeIsToday;
 }

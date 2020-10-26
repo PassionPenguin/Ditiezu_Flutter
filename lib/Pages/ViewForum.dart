@@ -147,7 +147,6 @@ class _ViewForumState extends State<ViewForum> with TickerProviderStateMixin, In
                                 ]));
                           else if (index >= forumList.length) return Container();
                           var data = forumList[index];
-                          var dt = data.pubDate;
                           TextSpan tp = () {
                             var c = <InlineSpan>[];
                             c.add(TextSpan(text: data.badge, style: TextStyle(fontSize: 18.5, fontWeight: FontWeight.w400, color: Colors.lightBlue)));
@@ -176,7 +175,8 @@ class _ViewForumState extends State<ViewForum> with TickerProviderStateMixin, In
                                             Padding(padding: EdgeInsets.only(top: 8)),
                                             Text.rich(tp),
                                             Padding(padding: EdgeInsets.only(top: 8)),
-                                            Text("${data.authorName} $dt", style: TextStyle(fontSize: 12)),
+                                            Text.rich(TextSpan(children: List<InlineSpan>()..add(TextSpan(text: data.authorName))..add(TextSpan(text: " "))..add(TextSpan(text: data.pubDate, style: TextStyle(color: data.timeIsToday ? Colors.orange[800] : Colors.grey[800])))),
+                                                style: TextStyle(fontSize: 12)),
                                             if (data.threadContent.trim().isNotEmpty) Column(children: [Padding(padding: EdgeInsets.only(top: 4)), Text(data.threadContent, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400), maxLines: 3)]),
                                             Padding(padding: EdgeInsets.only(top: 8)),
                                             Row(children: [
@@ -313,7 +313,8 @@ class _ViewForumState extends State<ViewForum> with TickerProviderStateMixin, In
           element.querySelector("[src='comiis_xy/folder_hot.gif']") != null,
           element.querySelector(".by em").querySelector(".xi1") != null,
           element.querySelector("[alt='attach_img']") != null,
-          element.querySelector("[alt='attachment']") != null));
+          element.querySelector("[alt='attachment']") != null,
+          element.querySelector(".by em").querySelector(".xi1") != null));
     });
     setState(() {});
     clearAnim();

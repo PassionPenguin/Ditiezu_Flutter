@@ -28,7 +28,7 @@ class _NotificationListState extends State<NotificationList> {
                     Routes.navigateTo(context, Routes.thread, params: {'tid': data.tid.toString(), "page": data.page.toString()});
                   },
                   child: Padding(
-                      padding: const EdgeInsets.only(top: 24.0, bottom: 8.0, right: 24.0, left: 24.0),
+                      padding: const EdgeInsets.only(top: 12.0, bottom: 12.0, right: 24.0, left: 24.0),
                       child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                         Container(
                             width: 40,
