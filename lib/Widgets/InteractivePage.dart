@@ -47,7 +47,7 @@ abstract class InteractivePage {
     return IconMessage(icon: _icon, color: _color, message: _message);
   }
 
-  void setLoading() {
+  void showLoading() {
     fadeController["loading"].forward();
     fadeController["main"].reverse();
     fadeController["messaging"].reverse();
@@ -59,47 +59,31 @@ abstract class InteractivePage {
       });
   }
 
-  void setAnim(bool isLoading, bool isMessageShowing, String message, Color color, IconData icon) {
-    if (isMessageShowing) {
-      fadeController["main"].reverse();
-      fadeController["messaging"].forward();
-      if (_loadingEnabled) fadeController["loading"].reverse();
-      print(fadeAnimation["messaging"]);
-      print(fadeAnimation["loading"]);
-      print(fadeAnimation["main"]);
-    } else if (isLoading && _loadingEnabled) {
-      fadeController["loading"].forward();
-      fadeController["main"].reverse();
-      fadeController["messaging"].reverse();
-    } else {
-      fadeController["main"].forward();
-      fadeController["messaging"].reverse();
-      if (_loadingEnabled) fadeController["loading"].reverse();
-    }
+  void showMessage(String message, Color color, IconData icon) {
+    fadeController["main"].reverse();
+    fadeController["messaging"].forward();
+    if (_loadingEnabled) fadeController["loading"].reverse();
     if (_parentState.mounted) {
       // ignore: invalid_use_of_protected_member
       _parentState.setState(() {
-        _isLoading = isLoading;
         _isMessageShowing = isMessageShowing;
         _message = message;
         _color = color;
         _icon = _icon;
       });
-      if (isMessageShowing)
-        Future.delayed(Duration(seconds: 2), () {
-          // ignore: invalid_use_of_protected_member
-          _parentState.setState(() {
-            _isMessageShowing = false;
-            fadeController["main"].forward();
-            fadeController["messaging"].reverse();
-            if (_loadingEnabled) fadeController["loading"].reverse();
-          });
+      Future.delayed(Duration(seconds: 2), () {
+        // ignore: invalid_use_of_protected_member
+        _parentState.setState(() {
+          _isMessageShowing = false;
+          fadeController["main"].forward();
+          fadeController["messaging"].reverse();
+          if (_loadingEnabled) fadeController["loading"].reverse();
         });
-      // ignore: invalid_use_of_protected_member
+      });
     }
   }
 
-  void clearAnim(){
+  void clearAnim() {
     fadeController["loading"].reverse();
     fadeController["messaging"].reverse();
     fadeController["main"].forward();

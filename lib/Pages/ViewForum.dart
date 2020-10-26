@@ -244,7 +244,13 @@ class _ViewForumState extends State<ViewForum> with TickerProviderStateMixin, In
     return Scaffold(body: SafeArea(bottom: true, child: el));
   }
 
-  queryParams() {
+  String queryParams() {
+    /**
+     * [Function] queryParams
+     * @return (String) query parameters
+     * @purpose generate the query parameters
+     */
+
     var params = "";
     if (typeID && selectedType.id != -1) {
       params += "&typeid=${selectedType.id}";
@@ -256,51 +262,60 @@ class _ViewForumState extends State<ViewForum> with TickerProviderStateMixin, In
     return params;
   }
 
-  _contentResolver() {
-    setLoading();
-    () async {
-      var response = await NetWork().get("http://www.ditiezu.com/forum.php?mod=forumdisplay&fid=$fid&page=$currentPage" + queryParams());
-      var document = parseHtmlDocument(response);
-      if (document.querySelector("#pgt .pg") != null)
-        pages = int.parse(document.querySelector("#pgt .pg").querySelectorAll("*:not(.nxt)").last.text.replaceFirst("... ", ""));
+  void _contentResolver() async {
+    /**
+     * [Future<Function>] queryParams
+     * @return null
+     * @purpose retrieve and process the threads list.
+     */
+
+    /* [API] Forum Threads List Retriever
+      @method GET
+      @url http://www.ditiezu.com/forum.php?mod=forumdisplay&fid=[fid]&page=[page](+ [options])
+      @expected
+        Succeed: HTML document with threads list
+     */
+    var response = await NetWork().get("http://www.ditiezu.com/forum.php?mod=forumdisplay&fid=$fid&page=$currentPage" + queryParams());
+    var document = parseHtmlDocument(response);
+    if (document.querySelector("#pgt .pg") != null)
+      pages = int.parse(document.querySelector("#pgt .pg").querySelectorAll("*:not(.nxt)").last.text.replaceFirst("... ", ""));
+    else
+      pages = 1;
+    forumList = [];
+    document.querySelectorAll("#thread_types li:not(#ttp_all):not(.xw1) a").forEach((e) {
+      var hrf = e.attributes["href"];
+      hrf = hrf.substring(hrf.indexOf("typeid=") + 7);
+      int id;
+      if (hrf.contains("&"))
+        id = int.parse(hrf.substring(0, hrf.indexOf("&")));
       else
-        pages = 1;
-      forumList = [];
-      document.querySelectorAll("#thread_types li:not(#ttp_all):not(.xw1) a").forEach((e) {
-        var hrf = e.attributes["href"];
-        hrf = hrf.substring(hrf.indexOf("typeid=") + 7);
-        int id;
-        if (hrf.contains("&"))
-          id = int.parse(hrf.substring(0, hrf.indexOf("&")));
-        else
-          id = int.parse(hrf);
-        _typesList.add(SelectItem.full(name: e.text, isSelected: false, id: id));
-      });
-      document.querySelectorAll("[id^='normalthread_']").forEach((element) {
-        var author = element.querySelectorAll(".by cite a")[0];
-        var authorLink = author.attributes["href"];
-        var title = element.querySelector(".xst");
-        var targetId = title.attributes["href"].contains(".html")
-            ? int.parse(title.attributes["href"].substring(30, title.attributes["href"].lastIndexOf(".html") - 4))
-            : int.parse(title.attributes["href"].substring(52, title.attributes["href"].indexOf("&", 52)));
-        forumList.add(ThreadItem(
-            title.innerHtml,
-            "",
-            author.innerHtml,
-            element.querySelector(".by em").text,
-            element.querySelector("em").innerText,
-            targetId,
-            1,
-            int.parse(authorLink.substring(authorLink.indexOf("uid-") + 4, authorLink.indexOf(".html"))),
-            int.parse(element.querySelector(".num em").innerHtml),
-            int.parse(element.querySelector(".num a").innerHtml),
-            element.querySelector("[src='comiis_xy/folder_hot.gif']") != null,
-            element.querySelector(".by em").querySelector(".xi1") != null,
-            element.querySelector("[alt='attach_img']") != null,
-            element.querySelector("[alt='attachment']") != null));
-      });
-      setState(() {});
-      clearAnim();
-    }();
+        id = int.parse(hrf);
+      _typesList.add(SelectItem.full(name: e.text, isSelected: false, id: id));
+    });
+    document.querySelectorAll("[id^='normalthread_']").forEach((element) {
+      var author = element.querySelectorAll(".by cite a")[0];
+      var authorLink = author.attributes["href"];
+      var title = element.querySelector(".xst");
+      var targetId = title.attributes["href"].contains(".html")
+          ? int.parse(title.attributes["href"].substring(30, title.attributes["href"].lastIndexOf(".html") - 4))
+          : int.parse(title.attributes["href"].substring(52, title.attributes["href"].indexOf("&", 52)));
+      forumList.add(ThreadItem(
+          title.innerHtml,
+          "",
+          author.innerHtml,
+          element.querySelector(".by em").text,
+          element.querySelector("em").innerText,
+          targetId,
+          1,
+          int.parse(authorLink.substring(authorLink.indexOf("uid-") + 4, authorLink.indexOf(".html"))),
+          int.parse(element.querySelector(".num em").innerHtml),
+          int.parse(element.querySelector(".num a").innerHtml),
+          element.querySelector("[src='comiis_xy/folder_hot.gif']") != null,
+          element.querySelector(".by em").querySelector(".xi1") != null,
+          element.querySelector("[alt='attach_img']") != null,
+          element.querySelector("[alt='attachment']") != null));
+    });
+    setState(() {});
+    clearAnim();
   }
 }

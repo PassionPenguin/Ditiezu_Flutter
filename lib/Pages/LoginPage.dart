@@ -174,6 +174,12 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin, In
   }
 
   void performLogin() async {
+    /**
+     * [Function] performLogin
+     * @return null
+     * @purpose post login formdata to validate and retrieve the response.
+     */
+
     setState(() {
       isLoading = true; // This variable is mutable to indicate the SubmitButton's animation instead of the interactive page.
     });
@@ -204,7 +210,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin, In
     }
 
     var status = doc.querySelector("#messagetext .mbn").text.contains("欢迎您回来");
-    setAnim(false, true, doc.querySelector("#messagetext .mbn").text, status ? Colors.green : Colors.red, status ? Icons.check : Icons.clear);
+    showMessage(doc.querySelector("#messagetext .mbn").text, status ? Colors.green : Colors.red, status ? Icons.check : Icons.clear);
     if (status) {
       // Save the username and the uid.
       var usr = User(
@@ -231,10 +237,10 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin, In
 
   Future<NetworkImage> loadCode() async {
     /**
-     * [Function] loadCode(hash: String)
+     * [Future<Function>] loadCode(hash: String)
      * @param hash: String, the code hash (or sechash)
-     * @return null
-     * @purpose show security code -> ImageView
+     * @return Future<NetworkImage>
+     * @purpose get verification code
      */
 
     /* [API] Login Verification Code Url Getter
@@ -259,6 +265,12 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin, In
   }
 
   void init() {
+    /**
+     * [Function] init
+     * @return null
+     * @purpose get login form data from server
+     */
+
     () async {
       Directory appDocDir = await getApplicationDocumentsDirectory();
       String appDocPath = appDocDir.path;

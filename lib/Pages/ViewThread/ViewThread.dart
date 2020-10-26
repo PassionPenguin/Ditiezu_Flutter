@@ -190,89 +190,100 @@ class _ViewThreadState extends State<ViewThread> with TickerProviderStateMixin, 
         body: el);
   }
 
-  _contentResolver() {
-    setLoading();
+  void _contentResolver() async {
+    /**
+     * [Future<Function>] _contentResolver
+     * @return null
+     * @purpose retrieve and process the thread page.
+     */
+
+    showLoading();
     try {
-      () async {
-        posts = [];
-        var response = await NetWork().get("http://www.ditiezu.com/forum.php?mod=viewthread&tid=$tid&page=$currentPage");
-        var doc = parseHtmlDocument(response);
-        if (doc.querySelector("#messagetext") != null) {
-          setAnim(false, true, doc.querySelector("#messagetext p").text, Colors.red, Icons.clear);
+      posts = [];
+      var response = await NetWork().get("http://www.ditiezu.com/forum.php?mod=viewthread&tid=$tid&page=$currentPage");
+      var doc = parseHtmlDocument(response);
+      if (doc.querySelector("#messagetext") != null) {
+        showMessage(doc.querySelector("#messagetext p").text, Colors.red, Icons.clear);
+        return;
+      }
+      fid = doc.querySelector("#dzsearchforumid").attributes["value"];
+      formhash = doc.querySelector("[name=\"formhash\"]").attributes["value"];
+      int index = 0;
+      doc.querySelectorAll("ignore_js_op").forEach((e) {
+        if (e.containsQuery("[id^='aimg_']")) {
+          var img = new Element.img();
+          var fileSrc = e.querySelector("[id^='aimg_']").attributes["file"];
+          img.setAttribute("src", fileSrc.contains("http") ? fileSrc : "http://www.ditiezu.com/$fileSrc");
+          e.replaceWith(img);
+        }
+      });
+      doc.querySelectorAll("[file]").forEach((e) {
+        e.setAttribute("src", e.attributes["file"]);
+      });
+      doc.querySelectorAll("[smilieid]").forEach((e) {
+        e.setAttribute("src", "asset:" + e.attributes["src"].replaceFirst("image", "assets/images"));
+      });
+      scoreEnabled = doc.containsQuery("[onclick^=\"showWindow('rate'\"]");
+      if (doc.containsQuery(".ratl")) {
+        doc.querySelectorAll(".ratl a").forEach((a) {
+          a.className = "noHighLight";
+        });
+        doc.querySelectorAll("[id^='rate_'] td").forEach((cell) {
+          cell.style.verticalAlign = "middle";
+        });
+        doc.querySelectorAll("[id^='rate_'] img").forEach((img) {
+          img.className = "score_avatar";
+        });
+
+        doc.querySelectorAll(".ratl i").forEach((i) {
+          i.className = "noStyle";
+        });
+
+        doc.querySelectorAll("[onclick^='toggleRatelogCollapse(']").forEach((collapse) {
+          collapse.remove();
+        });
+        doc.querySelectorAll(".ratc .xi2").forEach((all) {
+          all.remove();
+        });
+        doc.querySelectorAll("[id^='post_rate']").forEach((pr) {
+          pr.remove();
+        });
+      }
+      title = doc.querySelector("#thread_subject").text;
+      doc.querySelectorAll("table[id^='pid']").forEach((e) {
+        if (e.querySelector(".avatar").text == "头像被屏蔽") {
+          posts.add(PostItem("", e.querySelector(".authi .xw1").innerText, -1, "第" + ((currentPage - 1) * 15 + index + 1).toString() + "楼 - " + e.querySelector("[id^='authorposton']").innerText.substring(4), int.parse(e.id.substring(3)), false));
           return;
         }
-        fid = doc.querySelector("#dzsearchforumid").attributes["value"];
-        formhash = doc.querySelector("[name=\"formhash\"]").attributes["value"];
-        int index = 0;
-        doc.querySelectorAll("ignore_js_op").forEach((e) {
-          if (e.containsQuery("[id^='aimg_']")) {
-            var img = new Element.img();
-            var fileSrc = e.querySelector("[id^='aimg_']").attributes["file"];
-            img.setAttribute("src", fileSrc.contains("http") ? fileSrc : "http://www.ditiezu.com/$fileSrc");
-            e.replaceWith(img);
-          }
-        });
-        doc.querySelectorAll("[file]").forEach((e) {
-          e.setAttribute("src", e.attributes["file"]);
-        });
-        doc.querySelectorAll("[smilieid]").forEach((e) {
-          e.setAttribute("src", "asset:" + e.attributes["src"].replaceFirst("image", "assets/images"));
-        });
-        scoreEnabled = doc.containsQuery("[onclick^=\"showWindow('rate'\"]");
-        if (doc.containsQuery(".ratl")) {
-          doc.querySelectorAll(".ratl a").forEach((a) {
-            a.className = "noHighLight";
-          });
-          doc.querySelectorAll("[id^='rate_'] td").forEach((cell) {
-            cell.style.verticalAlign = "middle";
-          });
-          doc.querySelectorAll("[id^='rate_'] img").forEach((img) {
-            img.className = "score_avatar";
-          });
-
-          doc.querySelectorAll(".ratl i").forEach((i) {
-            i.className = "noStyle";
-          });
-
-          doc.querySelectorAll("[onclick^='toggleRatelogCollapse(']").forEach((collapse) {
-            collapse.remove();
-          });
-          doc.querySelectorAll(".ratc .xi2").forEach((all) {
-            all.remove();
-          });
-          doc.querySelectorAll("[id^='post_rate']").forEach((pr) {
-            pr.remove();
-          });
-        }
-        title = doc.querySelector("#thread_subject").text;
-        doc.querySelectorAll("table[id^='pid']").forEach((e) {
-          if (e.querySelector(".avatar").text == "头像被屏蔽") {
-            posts.add(PostItem("", e.querySelector(".authi .xw1").innerText, -1, "第" + ((currentPage - 1) * 15 + index + 1).toString() + "楼 - " + e.querySelector("[id^='authorposton']").innerText.substring(4), int.parse(e.id.substring(3)), false));
-            return;
-          }
-          var src = e.querySelector(".avatar a").attributes["href"];
-          posts.add(PostItem(
-              e.querySelector(".pcb").querySelector("[id^='postmessage']").innerHtml +
-                  (e.querySelector(".pcb").querySelector(".pattl") != null ? e.querySelector(".pcb").querySelector(".pattl").innerHtml : "") +
-                  (e.querySelector(".locked") != null ? "<div class='locked'>抱歉，您需要登录才可以查看或下载附件</div>" : "") +
-                  (e.querySelector("[id^='ratelog_']") != null ? "<p> </p><hr><div id='rateContainer'><table>" + e.querySelector(".ratl").innerHtml + "</table></div>" + e.querySelector(".ratc").innerHtml : ""),
-              e.querySelector(".authi .xw1").innerText,
-              int.parse(((src.indexOf("uid-") + 4 <= 0 || src.indexOf(".html") <= 0) ? 0 : src.substring(src.indexOf("uid-") + 4, src.indexOf(".html")))),
-              "第" + ((currentPage - 1) * 15 + index + 1).toString() + "楼 - " + e.querySelector("[id^='authorposton']").innerText.substring(4),
-              int.parse(e.id.substring(3)),
-              e.querySelector(".editp") != null));
-          index++;
-        });
-        if (doc.querySelector("#pgt .pg") != null) pages = int.parse(doc.querySelector("#pgt .pg").querySelectorAll("*:not(.nxt)").last.text.replaceFirst("... ", ""));
-        setState(() {});
-        clearAnim();
-      }();
+        var src = e.querySelector(".avatar a").attributes["href"];
+        posts.add(PostItem(
+            e.querySelector(".pcb").querySelector("[id^='postmessage']").innerHtml +
+                (e.querySelector(".pcb").querySelector(".pattl") != null ? e.querySelector(".pcb").querySelector(".pattl").innerHtml : "") +
+                (e.querySelector(".locked") != null ? "<div class='locked'>抱歉，您需要登录才可以查看或下载附件</div>" : "") +
+                (e.querySelector("[id^='ratelog_']") != null ? "<p> </p><hr><div id='rateContainer'><table>" + e.querySelector(".ratl").innerHtml + "</table></div>" + e.querySelector(".ratc").innerHtml : ""),
+            e.querySelector(".authi .xw1").innerText,
+            int.parse(((src.indexOf("uid-") + 4 <= 0 || src.indexOf(".html") <= 0) ? 0 : src.substring(src.indexOf("uid-") + 4, src.indexOf(".html")))),
+            "第" + ((currentPage - 1) * 15 + index + 1).toString() + "楼 - " + e.querySelector("[id^='authorposton']").innerText.substring(4),
+            int.parse(e.id.substring(3)),
+            e.querySelector(".editp") != null));
+        index++;
+      });
+      if (doc.querySelector("#pgt .pg") != null) pages = int.parse(doc.querySelector("#pgt .pg").querySelectorAll("*:not(.nxt)").last.text.replaceFirst("... ", ""));
+      setState(() {});
+      clearAnim();
     } catch (e) {
       clearAnim();
     }
   }
 
-  _requestScore(int pid) {
+  void _requestScore(int pid) {
+    /**
+     * [Function] _requestScore(pid: int)
+     * @param pid: int, the id of the thread
+     * @return null
+     * @purpose get the rating formdata, and show the rating window.
+     */
+
     Animation<double> _fadeAnimation;
     AnimationController _fadeController;
     _fadeController = new AnimationController(vsync: this, duration: Duration(seconds: 1));

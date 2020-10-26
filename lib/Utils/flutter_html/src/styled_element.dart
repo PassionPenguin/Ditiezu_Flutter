@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
+// ignore: implementation_imports
 import 'package:html/src/query_selector.dart';
 
 import '../../Exts.dart';

@@ -34,12 +34,12 @@ class _NotificationTabState extends State<NotificationTab> with TickerProviderSt
   _contentRetriever() async {
     clearAnim();
     notificationList = [];
-    setLoading();
+    showLoading();
     var response = await NetWork().get("http://www.ditiezu.com/home.php?mod=space&do=notice&isread=${isRead ? 1 : 0}");
     clearAnim();
     var doc = parseHtmlDocument(response);
     if (doc.querySelector(".emp") != null && doc.querySelector(".emp").text.contains("暂时没有新提醒")) {
-      setAnim(false, true, "暂时没有新提醒", Colors.green, Icons.check);
+      showMessage("暂时没有新提醒", Colors.green, Icons.check);
       return;
     }
     var aBrackets = [];
@@ -68,7 +68,7 @@ class _NotificationTabState extends State<NotificationTab> with TickerProviderSt
       }
     });
     () async {
-      setLoading();
+      showLoading();
       for (int i = 0; i < aBrackets.length; i++) {
         var tid = "-1";
         var page = "1";

@@ -4,13 +4,12 @@ class Counter extends StatefulWidget {
   final double max;
   final double min;
 
-  CounterState state;
+  final CounterState state = CounterState();
 
   Counter({Key key, this.max = double.infinity, this.min = double.negativeInfinity}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    state = CounterState();
     return state;
   }
 }
