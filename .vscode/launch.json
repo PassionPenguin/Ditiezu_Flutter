@@ -5,9 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Ditiezu",
+            "name": "ditiezu",
             "request": "launch",
             "type": "dart"
+        },
+        {
+            "name": "ditiezu (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
         }
     ]
 }

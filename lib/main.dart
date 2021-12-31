@@ -1,47 +1,32 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:fluro/fluro.dart';
-import 'package:flutter/cupertino.dart' hide Router;
-import 'package:flutter/material.dart' hide Router;
+import 'dart:io';
 
-import 'Pages/StartupPage.dart';
-import 'Route/Routes.dart';
+import 'package:ditiezu/data/theme.dart';
+import 'package:ditiezu/widget/extended_page.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  final router = Router();
-  Routes.configureRoutes(router);
-  Routes.router = router;
-  runApp(MyApp());
+import 'ui/home/home_page.dart';
+
+void main() {
+  runApp(const Application());
 }
 
-class MyApp extends StatelessWidget {
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+class Application extends StatelessWidget {
+  const Application({Key? key}) : super(key: key);
+  static late BuildContext context;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        // Initialize FlutterFire:
-        future: _initialization,
-        builder: (context, snapshot) {
-          // Once complete, show your application
-          if (snapshot.connectionState == ConnectionState.done || snapshot.hasError) {
-            return MaterialApp(
-                theme: ThemeData.light(),
-                debugShowCheckedModeBanner: false,
-                title: 'Ditiezu',
-                onGenerateRoute: Routes.router.generator,
-                // 配置route generate
-                home: SplashPage());
-          }
+    Application.context = context;
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light));
 
-          // Otherwise, show something whilst waiting for initialization to complete
-          return MaterialApp(
-              theme: ThemeData.light(),
-              debugShowCheckedModeBanner: false,
-              title: 'Ditiezu',
-              onGenerateRoute: Routes.router.generator,
-              // 配置route generate
-              home: Scaffold(body: Center(child: CircularProgressIndicator())));
-        });
+    return MaterialApp(
+      title: 'Ditiezu',
+      theme: baseThemeData,
+      debugShowCheckedModeBanner: false,
+      home:  const ExtendedPage(child: HomePage()),
+    );
   }
 }
